@@ -1,0 +1,41 @@
+import { create } from 'zustand'
+
+export interface Asset {
+  id: string
+  name: string
+  category: 'VEHICLE' | 'RIG' | 'PERIPHERAL' | 'NETWORK'
+  status: 'ACTIVE' | 'STORED' | 'SOLD' | 'WISHLIST'
+  coverImage?: string
+  purchaseDate?: string
+  purchasePrice?: number
+  notes?: string
+  isPublic: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+interface AppStore {
+  assets: Asset[]
+  setAssets: (assets: Asset[]) => void
+  addAsset: (asset: Asset) => void
+  updateAsset: (id: string, asset: Partial<Asset>) => void
+  deleteAsset: (id: string) => void
+  isLoading: boolean
+  setIsLoading: (loading: boolean) => void
+}
+
+export const useAppStore = create<AppStore>((set) => ({
+  assets: [],
+  setAssets: (assets) => set({ assets }),
+  addAsset: (asset) => set((state) => ({ assets: [...state.assets, asset] })),
+  updateAsset: (id, asset) =>
+    set((state) => ({
+      assets: state.assets.map((a) => (a.id === id ? { ...a, ...asset } : a)),
+    })),
+  deleteAsset: (id) =>
+    set((state) => ({
+      assets: state.assets.filter((a) => a.id !== id),
+    })),
+  isLoading: false,
+  setIsLoading: (loading) => set({ isLoading: loading }),
+}))
