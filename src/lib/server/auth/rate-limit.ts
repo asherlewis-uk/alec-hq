@@ -1,16 +1,14 @@
 import { createHash } from "node:crypto";
 import { getServiceSupabase, getSessionSecret } from "@/lib/server/supabase";
 
-const WINDOW_MINUTES = Number(process.env.AUTH_RATE_LIMIT_WINDOW_MINUTES ?? "15");
+const WINDOW_MINUTES = Number(
+  process.env.AUTH_RATE_LIMIT_WINDOW_MINUTES ?? "15",
+);
 const BLOCK_MINUTES = Number(process.env.AUTH_RATE_LIMIT_BLOCK_MINUTES ?? "15");
 const MAX_ATTEMPTS = Number(process.env.AUTH_RATE_LIMIT_MAX_ATTEMPTS ?? "5");
 
 function nowMs() {
   return Date.now();
-}
-
-function toIso(ms: number) {
-  return new Date(ms).toISOString();
 }
 
 export function getRequestIp(requestHeaders: Headers): string {
@@ -32,43 +30,33 @@ interface AttemptState {
 }
 
 export async function recordFailedAttempt(ip: string): Promise<AttemptState> {
-  const supabase = getServiceSupabase();
   const ipHash = hashIp(ip);
-  const now = nowMs();
+  const supabase = getServiceSupabase();
 
-  const { data: row } = await supabase
-    .from("auth_attempts")
-    .select("*")
-    .eq("ip_hash", ipHash)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("increment_failed_attempt", {
+    p_ip_hash: ipHash,
+    p_window_minutes: WINDOW_MINUTES,
+    p_block_minutes: BLOCK_MINUTES,
+    p_max_attempts: MAX_ATTEMPTS,
+  });
 
-  const windowStartMs = row?.window_start ? new Date(row.window_start).getTime() : now;
-  const blockUntilMs = row?.blocked_until ? new Date(row.blocked_until).getTime() : 0;
-
-  if (blockUntilMs > now) {
-    return { blocked: true, retryAfterSeconds: Math.ceil((blockUntilMs - now) / 1000) };
+  if (error || !data || data.length === 0) {
+    console.error("Rate limit RPC error:", error);
+    // Fail closed if the DB errors out
+    return { blocked: true, retryAfterSeconds: BLOCK_MINUTES * 60 };
   }
 
-  const windowExpired = now - windowStartMs > WINDOW_MINUTES * 60 * 1000;
-  const baseAttempts = windowExpired ? 0 : row?.attempt_count ?? 0;
-  const nextAttempts = baseAttempts + 1;
-  const shouldBlock = nextAttempts >= MAX_ATTEMPTS;
-  const blockedUntil = shouldBlock ? toIso(now + BLOCK_MINUTES * 60 * 1000) : null;
+  const result = data[0];
+  let retryAfterSeconds = 0;
 
-  await supabase.from("auth_attempts").upsert(
-    {
-      ip_hash: ipHash,
-      window_start: windowExpired ? toIso(now) : row?.window_start ?? toIso(now),
-      attempt_count: nextAttempts,
-      blocked_until: blockedUntil,
-      updated_at: toIso(now),
-    },
-    { onConflict: "ip_hash" }
-  );
+  if (result.is_blocked && result.blocked_until) {
+    const blockEnd = new Date(result.blocked_until).getTime();
+    retryAfterSeconds = Math.max(0, Math.ceil((blockEnd - Date.now()) / 1000));
+  }
 
   return {
-    blocked: shouldBlock,
-    retryAfterSeconds: shouldBlock ? BLOCK_MINUTES * 60 : 0,
+    blocked: result.is_blocked,
+    retryAfterSeconds,
   };
 }
 
@@ -88,7 +76,9 @@ export async function isBlocked(ip: string): Promise<AttemptState> {
     .eq("ip_hash", ipHash)
     .maybeSingle();
 
-  const blockedUntilMs = row?.blocked_until ? new Date(row.blocked_until).getTime() : 0;
+  const blockedUntilMs = row?.blocked_until
+    ? new Date(row.blocked_until).getTime()
+    : 0;
   if (blockedUntilMs > now) {
     return {
       blocked: true,

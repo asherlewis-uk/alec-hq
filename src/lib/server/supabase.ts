@@ -1,8 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/types/database";
 
-let cachedClient: ReturnType<typeof createClient<Database>> | null = null;
-
 function getRequiredEnv(name: string): string {
   const value = process.env[name];
   if (!value) {
@@ -12,24 +10,12 @@ function getRequiredEnv(name: string): string {
 }
 
 export function getServiceSupabase() {
-  if (cachedClient) return cachedClient;
+  const supabaseUrl = getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL");
+  const serviceRoleKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
 
-  const supabaseUrl = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for server-side data access.");
-  }
-
-  cachedClient = createClient<Database>(supabaseUrl, serviceRoleKey, {
+  return createClient<Database>(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false },
-    global: {
-      headers: {
-        "x-client-info": "alec-hq-server",
-      },
-    },
   });
-  return cachedClient;
 }
 
 export function getSessionSecret() {

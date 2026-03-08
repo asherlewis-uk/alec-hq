@@ -5,7 +5,12 @@ export class ApiClientError extends Error {
   code: string;
   details?: unknown;
 
-  constructor(status: number, code: string, message: string, details?: unknown) {
+  constructor(
+    status: number,
+    code: string,
+    message: string,
+    details?: unknown,
+  ) {
     super(message);
     this.name = "ApiClientError";
     this.status = status;
@@ -18,15 +23,26 @@ interface RequestOptions extends Omit<RequestInit, "body"> {
   body?: unknown;
 }
 
-export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+export async function apiRequest<T>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<T> {
+  const defaultSignal =
+    typeof AbortSignal !== "undefined" && AbortSignal.timeout
+      ? AbortSignal.timeout(15000)
+      : undefined;
+
+  const headers = {
+    "content-type": "application/json",
+    ...(options.headers ?? {}),
+  };
+
   const response = await fetch(path, {
     ...options,
-    headers: {
-      "content-type": "application/json",
-      ...(options.headers ?? {}),
-    },
+    headers,
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
     cache: "no-store",
+    signal: options.signal || defaultSignal,
   });
 
   if (!response.ok) {
@@ -39,8 +55,9 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     throw new ApiClientError(
       response.status,
       payload?.error?.code ?? "UNKNOWN_ERROR",
-      payload?.error?.message ?? `Request failed with status ${response.status}`,
-      payload?.error?.details
+      payload?.error?.message ??
+        `Request failed with status ${response.status}`,
+      payload?.error?.details,
     );
   }
 
