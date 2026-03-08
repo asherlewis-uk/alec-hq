@@ -2,10 +2,12 @@
 
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Plus } from 'lucide-react'
+import { LogOut, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { QuickAddSheet } from '@/components/dashboard/QuickAddSheet'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { apiRequest } from '@/lib/api/client'
 
 const pathLabels: Record<string, string> = {
   '/': 'Dashboard',
@@ -15,7 +17,9 @@ const pathLabels: Record<string, string> = {
 
 export function TopBar() {
   const pathname = usePathname()
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const getLabel = () => {
     if (pathname.startsWith('/garage/')) return 'Vehicle Details'
@@ -30,6 +34,25 @@ export function TopBar() {
       </motion.div>
 
       <div className="flex items-center gap-3">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={isLoggingOut}
+          onClick={async () => {
+            setIsLoggingOut(true)
+            try {
+              await apiRequest('/api/auth/logout', { method: 'POST' })
+              router.replace('/login')
+              router.refresh()
+            } finally {
+              setIsLoggingOut(false)
+            }
+          }}
+          className="border-white/20 text-white hover:bg-white/10"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          {isLoggingOut ? 'Signing out...' : 'Sign out'}
+        </Button>
         <QuickAddSheet open={isOpen} onOpenChange={setIsOpen}>
           <Button
             onClick={() => setIsOpen(true)}

@@ -18,8 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { supabase } from '@/lib/supabase'
 import { LogType } from '@/lib/types'
+import { apiRequest } from '@/lib/api/client'
 
 interface AddLogModalProps {
   assetId: string
@@ -30,6 +30,7 @@ interface AddLogModalProps {
 
 export function AddLogModal({ assetId, open, onOpenChange, onSuccess }: AddLogModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     type: 'MAINTENANCE' as LogType,
     title: '',
@@ -43,32 +44,37 @@ export function AddLogModal({ assetId, open, onOpenChange, onSuccess }: AddLogMo
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
+    try {
+      await apiRequest(`/api/assets/${assetId}/logs`, {
+        method: 'POST',
+        body: {
+          type: formData.type,
+          title: formData.title,
+          description: formData.description || null,
+          date: formData.date,
+          mileage: formData.mileage ? parseFloat(formData.mileage) : null,
+          cost: formData.cost ? parseFloat(formData.cost) : null,
+          performedBy: formData.performedBy || null,
+        },
+      })
 
-    await supabase.from('asset_logs').insert([
-      {
-        asset_id: assetId,
-        type: formData.type,
-        title: formData.title,
-        description: formData.description || null,
-        date: formData.date,
-        mileage: formData.mileage ? parseFloat(formData.mileage) : null,
-        cost: formData.cost ? parseFloat(formData.cost) : null,
-        performed_by: formData.performedBy || null,
-      },
-    ])
-
-    setFormData({
-      type: 'MAINTENANCE',
-      title: '',
-      description: '',
-      date: new Date().toISOString().split('T')[0],
-      mileage: '',
-      cost: '',
-      performedBy: '',
-    })
-    onOpenChange(false)
-    onSuccess()
-    setIsSubmitting(false)
+      setFormData({
+        type: 'MAINTENANCE',
+        title: '',
+        description: '',
+        date: new Date().toISOString().split('T')[0],
+        mileage: '',
+        cost: '',
+        performedBy: '',
+      })
+      onOpenChange(false)
+      onSuccess()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add log entry')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -169,6 +175,7 @@ export function AddLogModal({ assetId, open, onOpenChange, onSuccess }: AddLogMo
           </div>
 
           <div className="flex gap-2 pt-4">
+            {error && <p className="text-red-300 text-sm">{error}</p>}
             <Button
               type="button"
               variant="outline"

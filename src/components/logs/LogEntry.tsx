@@ -5,8 +5,8 @@ import { formatDate, getLogTypeIcon } from '@/lib/utils/formatters'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Trash2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import { useState } from 'react'
+import { apiRequest } from '@/lib/api/client'
 
 interface LogEntryProps {
   log: AssetLog
@@ -19,8 +19,12 @@ export function LogEntry({ log, isLast, onDelete }: LogEntryProps) {
 
   const handleDelete = async () => {
     setIsDeleting(true)
-    await supabase.from('asset_logs').delete().eq('id', log.id)
-    onDelete()
+    try {
+      await apiRequest<void>(`/api/logs/${log.id}`, { method: 'DELETE' })
+      onDelete()
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   return (

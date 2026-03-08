@@ -18,8 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { supabase } from '@/lib/supabase'
 import { ComponentCondition } from '@/lib/types'
+import { apiRequest } from '@/lib/api/client'
 
 interface AddComponentModalProps {
   assetId: string
@@ -35,6 +35,7 @@ export function AddComponentModal({
   onSuccess,
 }: AddComponentModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
@@ -47,6 +48,7 @@ export function AddComponentModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
 
     const specs: Record<string, string> = {}
     if (formData.specs) {
@@ -56,22 +58,27 @@ export function AddComponentModal({
       })
     }
 
-    await supabase.from('components').insert([
-      {
-        asset_id: assetId,
-        name: formData.name,
-        brand: formData.brand || null,
-        model: formData.model || null,
-        condition: formData.condition,
-        specs: specs,
-        notes: formData.notes || null,
-      },
-    ])
+    try {
+      await apiRequest(`/api/assets/${assetId}/components`, {
+        method: 'POST',
+        body: {
+          name: formData.name,
+          brand: formData.brand || null,
+          model: formData.model || null,
+          condition: formData.condition,
+          specs,
+          notes: formData.notes || null,
+        },
+      })
 
-    setFormData({ name: '', brand: '', model: '', condition: 'STOCK', specs: '', notes: '' })
-    onOpenChange(false)
-    onSuccess()
-    setIsSubmitting(false)
+      setFormData({ name: '', brand: '', model: '', condition: 'STOCK', specs: '', notes: '' })
+      onOpenChange(false)
+      onSuccess()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add component')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -160,6 +167,7 @@ export function AddComponentModal({
           </div>
 
           <div className="flex gap-2 pt-4">
+            {error && <p className="text-red-300 text-sm">{error}</p>}
             <Button
               type="button"
               variant="outline"

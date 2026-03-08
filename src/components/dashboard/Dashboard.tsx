@@ -8,11 +8,11 @@ import { RecentAssetStrip } from './RecentAssetStrip'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function Dashboard() {
-  const { assets, isLoading, fetchAssets } = useAssets()
+  const { assets, isLoading, error, fetchAssets } = useAssets()
 
   useEffect(() => {
     fetchAssets()
-  }, [])
+  }, [fetchAssets])
 
   const stats = {
     totalAssets: assets.length,
@@ -49,6 +49,12 @@ export function Dashboard() {
       {assets.length === 0 && (
         <div className="glass rounded-glass p-12 text-center">
           <p className="text-text-secondary text-lg">No assets yet. Start by adding one!</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="glass rounded-glass p-4 border border-red-400/30">
+          <p className="text-red-300 text-sm">{error}</p>
         </div>
       )}
     </motion.div>

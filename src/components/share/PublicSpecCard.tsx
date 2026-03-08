@@ -41,9 +41,7 @@ export function PublicSpecCard({ asset, components }: PublicSpecCardProps) {
             </span>
           </div>
 
-          {asset.notes && (
-            <p className="text-sm text-text-secondary mt-4 italic">"{asset.notes}"</p>
-          )}
+          {asset.notes && <p className="text-sm text-text-secondary mt-4 italic">{asset.notes}</p>}
         </motion.div>
 
         {/* Specifications */}
@@ -84,11 +82,7 @@ export function PublicSpecCard({ asset, components }: PublicSpecCardProps) {
                     {component.condition}
                   </Badge>
 
-                  {component.notes && (
-                    <p className="text-xs text-text-muted mt-3 italic">
-                      {component.notes}
-                    </p>
-                  )}
+                  {component.notes && <p className="text-xs text-text-muted mt-3 italic">{component.notes}</p>}
                 </div>
               ))}
             </div>

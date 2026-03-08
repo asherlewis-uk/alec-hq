@@ -1,30 +1,19 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import { Component } from '@/lib/types'
+import { useCallback, useState } from 'react'
+import { apiRequest } from '@/lib/api/client'
+import { Component, CreateComponentInput } from '@/lib/types'
 
 export function useComponents(assetId: string) {
   const [components, setComponents] = useState<Component[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (assetId) {
-      fetchComponents()
-    }
-  }, [assetId])
-
-  const fetchComponents = async () => {
+  const fetchComponents = useCallback(async () => {
+    if (!assetId) return
     try {
       setIsLoading(true)
-      const { data, error: err } = await supabase
-        .from('components')
-        .select('*')
-        .eq('asset_id', assetId)
-        .order('created_at', { ascending: false })
-
-      if (err) throw err
+      const data = await apiRequest<Component[]>(`/api/assets/${assetId}/components`)
       setComponents(data || [])
       setError(null)
     } catch (err) {
@@ -32,48 +21,28 @@ export function useComponents(assetId: string) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [assetId])
 
-  const createComponent = async (component: Omit<Component, 'id' | 'createdAt'>) => {
+  const createComponent = useCallback(async (component: CreateComponentInput) => {
     try {
-      const { data, error: err } = await supabase
-        .from('components')
-        .insert([component])
-        .select()
-
-      if (err) throw err
-      if (data) {
-        setComponents([...components, ...data])
-      }
+      const created = await apiRequest<Component>(`/api/assets/${assetId}/components`, {
+        method: 'POST',
+        body: component,
+      })
+      setComponents([created, ...components])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create component')
     }
-  }
+  }, [assetId, components])
 
-  const updateComponent = async (id: string, updates: Partial<Component>) => {
+  const deleteComponent = useCallback(async (id: string) => {
     try {
-      const { error: err } = await supabase
-        .from('components')
-        .update(updates)
-        .eq('id', id)
-
-      if (err) throw err
-      await fetchComponents()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update component')
-    }
-  }
-
-  const deleteComponent = async (id: string) => {
-    try {
-      const { error: err } = await supabase.from('components').delete().eq('id', id)
-
-      if (err) throw err
+      await apiRequest<void>(`/api/components/${id}`, { method: 'DELETE' })
       setComponents(components.filter((c) => c.id !== id))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete component')
     }
-  }
+  }, [components])
 
   return {
     components,
@@ -81,7 +50,6 @@ export function useComponents(assetId: string) {
     error,
     fetchComponents,
     createComponent,
-    updateComponent,
     deleteComponent,
   }
 }

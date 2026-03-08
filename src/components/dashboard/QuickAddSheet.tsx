@@ -30,6 +30,7 @@ export function QuickAddSheet({ open, onOpenChange, children }: QuickAddSheetPro
   const [name, setName] = useState('')
   const [category, setCategory] = useState<AssetCategory>('RIG')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const { createAsset } = useAssets()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,16 +38,22 @@ export function QuickAddSheet({ open, onOpenChange, children }: QuickAddSheetPro
     if (!name.trim()) return
 
     setIsSubmitting(true)
-    await createAsset({
-      name,
-      category,
-      status: 'ACTIVE',
-      isPublic: false,
-    })
-    setName('')
-    setCategory('RIG')
-    onOpenChange(false)
-    setIsSubmitting(false)
+    setSubmitError(null)
+    try {
+      await createAsset({
+        name,
+        category,
+        status: 'ACTIVE',
+        isPublic: false,
+      })
+      setName('')
+      setCategory('RIG')
+      onOpenChange(false)
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Failed to create asset')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -93,6 +100,7 @@ export function QuickAddSheet({ open, onOpenChange, children }: QuickAddSheetPro
           >
             {isSubmitting ? 'Creating...' : 'Create Asset'}
           </Button>
+          {submitError && <p className="text-red-300 text-sm">{submitError}</p>}
         </form>
       </SheetContent>
     </Sheet>

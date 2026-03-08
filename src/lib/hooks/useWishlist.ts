@@ -1,30 +1,19 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import { WishlistItem } from '@/lib/types'
+import { useCallback, useState } from 'react'
+import { apiRequest } from '@/lib/api/client'
+import { CreateWishlistInput, WishlistItem } from '@/lib/types'
 
 export function useWishlist(assetId: string) {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (assetId) {
-      fetchWishlist()
-    }
-  }, [assetId])
-
-  const fetchWishlist = async () => {
+  const fetchWishlist = useCallback(async () => {
+    if (!assetId) return
     try {
       setIsLoading(true)
-      const { data, error: err } = await supabase
-        .from('wishlist_items')
-        .select('*')
-        .eq('asset_id', assetId)
-        .order('priority', { ascending: false })
-
-      if (err) throw err
+      const data = await apiRequest<WishlistItem[]>(`/api/assets/${assetId}/wishlist`)
       setWishlist(data || [])
       setError(null)
     } catch (err) {
@@ -32,34 +21,28 @@ export function useWishlist(assetId: string) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [assetId])
 
-  const createItem = async (item: Omit<WishlistItem, 'id' | 'createdAt'>) => {
+  const createItem = useCallback(async (item: CreateWishlistInput) => {
     try {
-      const { data, error: err } = await supabase
-        .from('wishlist_items')
-        .insert([item])
-        .select()
-
-      if (err) throw err
-      if (data) {
-        setWishlist([...wishlist, ...data])
-      }
+      const created = await apiRequest<WishlistItem>(`/api/assets/${assetId}/wishlist`, {
+        method: 'POST',
+        body: item,
+      })
+      setWishlist([...wishlist, created])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create item')
     }
-  }
+  }, [assetId, wishlist])
 
-  const deleteItem = async (id: string) => {
+  const deleteItem = useCallback(async (id: string) => {
     try {
-      const { error: err } = await supabase.from('wishlist_items').delete().eq('id', id)
-
-      if (err) throw err
+      await apiRequest<void>(`/api/wishlist/${id}`, { method: 'DELETE' })
       setWishlist(wishlist.filter((i) => i.id !== id))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete item')
     }
-  }
+  }, [wishlist])
 
   return {
     wishlist,

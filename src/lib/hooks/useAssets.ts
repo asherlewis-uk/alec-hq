@@ -1,30 +1,19 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import { Asset } from '@/lib/types'
+import { useCallback, useState } from 'react'
+import { apiRequest } from '@/lib/api/client'
+import { Asset, AssetCategory, CreateAssetInput, UpdateAssetInput } from '@/lib/types'
 import { useAppStore } from '@/lib/store/useAppStore'
 
-export function useAssets(category?: string) {
+export function useAssets(category?: AssetCategory) {
   const { assets, setAssets, isLoading, setIsLoading } = useAppStore()
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetchAssets()
-  }, [category])
-
-  const fetchAssets = async () => {
+  const fetchAssets = useCallback(async () => {
     try {
       setIsLoading(true)
-      let query = supabase.from('assets').select('*')
-
-      if (category) {
-        query = query.eq('category', category)
-      }
-
-      const { data, error: err } = await query.order('updated_at', { ascending: false })
-
-      if (err) throw err
+      const qs = category ? `?category=${encodeURIComponent(category)}` : ''
+      const data = await apiRequest<Asset[]>(`/api/assets${qs}`)
       setAssets(data || [])
       setError(null)
     } catch (err) {
@@ -32,48 +21,35 @@ export function useAssets(category?: string) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [category, setAssets, setIsLoading])
 
-  const createAsset = async (asset: Omit<Asset, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const createAsset = useCallback(async (asset: CreateAssetInput) => {
     try {
-      const { data, error: err } = await supabase
-        .from('assets')
-        .insert([asset])
-        .select()
-
-      if (err) throw err
-      if (data) {
-        setAssets([...assets, ...data])
-      }
+      const created = await apiRequest<Asset>('/api/assets', { method: 'POST', body: asset })
+      setAssets([created, ...assets])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create asset')
+      throw err
     }
-  }
+  }, [assets, setAssets])
 
-  const updateAsset = async (id: string, updates: Partial<Asset>) => {
+  const updateAsset = useCallback(async (id: string, updates: UpdateAssetInput) => {
     try {
-      const { error: err } = await supabase
-        .from('assets')
-        .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('id', id)
-
-      if (err) throw err
+      await apiRequest<Asset>(`/api/assets/${id}`, { method: 'PATCH', body: updates })
       await fetchAssets()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update asset')
     }
-  }
+  }, [fetchAssets])
 
-  const deleteAsset = async (id: string) => {
+  const deleteAsset = useCallback(async (id: string) => {
     try {
-      const { error: err } = await supabase.from('assets').delete().eq('id', id)
-
-      if (err) throw err
+      await apiRequest<void>(`/api/assets/${id}`, { method: 'DELETE' })
       setAssets(assets.filter((a) => a.id !== id))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete asset')
     }
-  }
+  }, [assets, setAssets])
 
   return {
     assets,

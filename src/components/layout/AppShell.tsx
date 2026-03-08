@@ -3,7 +3,6 @@
 import { ReactNode } from 'react'
 import { Sidebar } from './Sidebar'
 import { TopBar } from './TopBar'
-import { cn } from '@/lib/utils/cn'
 
 interface AppShellProps {
   children: ReactNode

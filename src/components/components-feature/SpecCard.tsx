@@ -47,9 +47,7 @@ export function SpecCard({ asset, components }: SpecCardProps) {
                 {component.condition}
               </Badge>
 
-              {component.notes && (
-                <p className="text-xs text-text-muted mt-3 italic">"{component.notes}"</p>
-              )}
+              {component.notes && <p className="text-xs text-text-muted mt-3 italic">{component.notes}</p>}
             </div>
           ))}
         </div>

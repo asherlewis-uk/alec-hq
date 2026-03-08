@@ -6,8 +6,8 @@ import { motion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Trash2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import { useState } from 'react'
+import { apiRequest } from '@/lib/api/client'
 
 interface ComponentCardProps {
   component: Component
@@ -19,8 +19,12 @@ export function ComponentCard({ component, onDelete }: ComponentCardProps) {
 
   const handleDelete = async () => {
     setIsDeleting(true)
-    await supabase.from('components').delete().eq('id', component.id)
-    onDelete()
+    try {
+      await apiRequest<void>(`/api/components/${component.id}`, { method: 'DELETE' })
+      onDelete()
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   return (
@@ -66,9 +70,7 @@ export function ComponentCard({ component, onDelete }: ComponentCardProps) {
       </Badge>
 
       {/* Notes */}
-      {component.notes && (
-        <p className="text-xs text-text-muted mt-3 italic">"{component.notes}"</p>
-      )}
+      {component.notes && <p className="text-xs text-text-muted mt-3 italic">{component.notes}</p>}
     </motion.div>
   )
 }

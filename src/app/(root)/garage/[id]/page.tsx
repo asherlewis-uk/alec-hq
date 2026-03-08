@@ -1,9 +1,8 @@
 'use client'
 
-import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import { Asset, Component, AssetLog, WishlistItem } from '@/lib/types'
+import { useParams, useRouter } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
+import { Asset } from '@/lib/types'
 import { AssetDetailHeader } from '@/components/assets/AssetDetailHeader'
 import { AssetTabNav } from '@/components/assets/AssetTabNav'
 import { ComponentList } from '@/components/components-feature/ComponentList'
@@ -13,7 +12,7 @@ import { useComponents } from '@/lib/hooks/useComponents'
 import { useLogs } from '@/lib/hooks/useLogs'
 import { useWishlist } from '@/lib/hooks/useWishlist'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useRouter } from 'next/navigation'
+import { apiRequest } from '@/lib/api/client'
 
 export default function GarageDetailPage() {
   const params = useParams()
@@ -27,30 +26,31 @@ export default function GarageDetailPage() {
   const { logs, fetchLogs } = useLogs(id)
   const { wishlist, fetchWishlist } = useWishlist(id)
 
-  useEffect(() => {
-    fetchAsset()
-  }, [id])
-
-  const fetchAsset = async () => {
+  const fetchAsset = useCallback(async () => {
     try {
-      const { data, error } = await supabase.from('assets').select('*').eq('id', id).single()
-      if (error) throw error
+      const data = await apiRequest<Asset>(`/api/assets/${id}`)
       setAsset(data)
-    } catch (err) {
-      console.error(err)
+    } catch {
       router.push('/garage')
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [id, router])
+
+  useEffect(() => {
+    fetchAsset()
+    fetchComponents()
+    fetchLogs()
+    fetchWishlist()
+  }, [fetchAsset, fetchComponents, fetchLogs, fetchWishlist])
 
   const handleDelete = async () => {
-    await supabase.from('assets').delete().eq('id', id)
+    await apiRequest<void>(`/api/assets/${id}`, { method: 'DELETE' })
     router.push('/garage')
   }
 
   const handleTogglePublic = async (isPublic: boolean) => {
-    await supabase.from('assets').update({ is_public: isPublic }).eq('id', id)
+    await apiRequest<Asset>(`/api/assets/${id}`, { method: 'PATCH', body: { isPublic } })
     fetchAsset()
   }
 

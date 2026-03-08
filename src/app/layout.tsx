@@ -1,10 +1,20 @@
 import type { Metadata } from 'next'
 import './globals.css'
 
+const metadataBase =
+  process.env.NEXT_PUBLIC_APP_URL && process.env.NEXT_PUBLIC_APP_URL.startsWith('http')
+    ? new URL(process.env.NEXT_PUBLIC_APP_URL)
+    : undefined
+
 export const metadata: Metadata = {
+  metadataBase,
   title: 'ALEC.HQ',
   description: 'Personal Command Center',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/icon-192x192.png',
+  },
 }
 
 export default function RootLayout({
@@ -16,7 +26,6 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="theme-color" content="#0d0d1a" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="antialiased">

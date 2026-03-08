@@ -1,18 +1,5 @@
 import { create } from 'zustand'
-
-export interface Asset {
-  id: string
-  name: string
-  category: 'VEHICLE' | 'RIG' | 'PERIPHERAL' | 'NETWORK'
-  status: 'ACTIVE' | 'STORED' | 'SOLD' | 'WISHLIST'
-  coverImage?: string
-  purchaseDate?: string
-  purchasePrice?: number
-  notes?: string
-  isPublic: boolean
-  createdAt: string
-  updatedAt: string
-}
+import type { Asset } from '@/lib/types'
 
 interface AppStore {
   assets: Asset[]

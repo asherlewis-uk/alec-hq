@@ -5,9 +5,9 @@ import { motion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Trash2, ExternalLink } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import { useState } from 'react'
 import { formatCurrency } from '@/lib/utils/formatters'
+import { apiRequest } from '@/lib/api/client'
 
 interface WishlistItemComponentProps {
   item: WishlistItem
@@ -19,8 +19,12 @@ export function WishlistItemComponent({ item, onDelete }: WishlistItemComponentP
 
   const handleDelete = async () => {
     setIsDeleting(true)
-    await supabase.from('wishlist_items').delete().eq('id', item.id)
-    onDelete()
+    try {
+      await apiRequest<void>(`/api/wishlist/${item.id}`, { method: 'DELETE' })
+      onDelete()
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   const priorityColor = {
@@ -38,9 +42,7 @@ export function WishlistItemComponent({ item, onDelete }: WishlistItemComponentP
         <div className="flex-1">
           <h3 className="font-semibold text-white">{item.name}</h3>
           {item.brand && <p className="text-sm text-text-secondary">{item.brand}</p>}
-          {item.notes && (
-            <p className="text-sm text-text-muted mt-2 italic">"{item.notes}"</p>
-          )}
+          {item.notes && <p className="text-sm text-text-muted mt-2 italic">{item.notes}</p>}
         </div>
         <div className="flex gap-2">
           {item.url && (

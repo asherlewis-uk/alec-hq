@@ -18,8 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { supabase } from '@/lib/supabase'
 import { WishlistPriority } from '@/lib/types'
+import { apiRequest } from '@/lib/api/client'
 
 interface AddWishlistModalProps {
   assetId: string
@@ -35,6 +35,7 @@ export function AddWishlistModal({
   onSuccess,
 }: AddWishlistModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
@@ -47,30 +48,35 @@ export function AddWishlistModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
+    try {
+      await apiRequest(`/api/assets/${assetId}/wishlist`, {
+        method: 'POST',
+        body: {
+          name: formData.name,
+          brand: formData.brand || null,
+          url: formData.url || null,
+          estimatedPrice: formData.estimatedPrice ? parseFloat(formData.estimatedPrice) : null,
+          priority: formData.priority,
+          notes: formData.notes || null,
+        },
+      })
 
-    await supabase.from('wishlist_items').insert([
-      {
-        asset_id: assetId,
-        name: formData.name,
-        brand: formData.brand || null,
-        url: formData.url || null,
-        estimated_price: formData.estimatedPrice ? parseFloat(formData.estimatedPrice) : null,
-        priority: formData.priority,
-        notes: formData.notes || null,
-      },
-    ])
-
-    setFormData({
-      name: '',
-      brand: '',
-      url: '',
-      estimatedPrice: '',
-      priority: 'MEDIUM',
-      notes: '',
-    })
-    onOpenChange(false)
-    onSuccess()
-    setIsSubmitting(false)
+      setFormData({
+        name: '',
+        brand: '',
+        url: '',
+        estimatedPrice: '',
+        priority: 'MEDIUM',
+        notes: '',
+      })
+      onOpenChange(false)
+      onSuccess()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add wishlist item')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -159,6 +165,7 @@ export function AddWishlistModal({
           </div>
 
           <div className="flex gap-2 pt-4">
+            {error && <p className="text-red-300 text-sm">{error}</p>}
             <Button
               type="button"
               variant="outline"

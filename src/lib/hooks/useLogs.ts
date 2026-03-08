@@ -1,30 +1,19 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import { AssetLog } from '@/lib/types'
+import { useCallback, useState } from 'react'
+import { apiRequest } from '@/lib/api/client'
+import { AssetLog, CreateAssetLogInput } from '@/lib/types'
 
 export function useLogs(assetId: string) {
   const [logs, setLogs] = useState<AssetLog[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (assetId) {
-      fetchLogs()
-    }
-  }, [assetId])
-
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
+    if (!assetId) return
     try {
       setIsLoading(true)
-      const { data, error: err } = await supabase
-        .from('asset_logs')
-        .select('*')
-        .eq('asset_id', assetId)
-        .order('date', { ascending: false })
-
-      if (err) throw err
+      const data = await apiRequest<AssetLog[]>(`/api/assets/${assetId}/logs`)
       setLogs(data || [])
       setError(null)
     } catch (err) {
@@ -32,34 +21,28 @@ export function useLogs(assetId: string) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [assetId])
 
-  const createLog = async (log: Omit<AssetLog, 'id' | 'createdAt'>) => {
+  const createLog = useCallback(async (log: CreateAssetLogInput) => {
     try {
-      const { data, error: err } = await supabase
-        .from('asset_logs')
-        .insert([log])
-        .select()
-
-      if (err) throw err
-      if (data) {
-        setLogs([...data, ...logs])
-      }
+      const created = await apiRequest<AssetLog>(`/api/assets/${assetId}/logs`, {
+        method: 'POST',
+        body: log,
+      })
+      setLogs([created, ...logs])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create log')
     }
-  }
+  }, [assetId, logs])
 
-  const deleteLog = async (id: string) => {
+  const deleteLog = useCallback(async (id: string) => {
     try {
-      const { error: err } = await supabase.from('asset_logs').delete().eq('id', id)
-
-      if (err) throw err
+      await apiRequest<void>(`/api/logs/${id}`, { method: 'DELETE' })
       setLogs(logs.filter((l) => l.id !== id))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete log')
     }
-  }
+  }, [logs])
 
   return {
     logs,

@@ -4,3 +4,7 @@ node_modules
 .env
 out
 build
+tsconfig.tsbuildinfo
+public/sw.js
+public/workbox-*.js
+public/swe-worker-*.js

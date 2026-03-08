@@ -1,7 +1,7 @@
 'use client'
 
 import { Asset } from '@/lib/types'
-import { getCategoryEmoji, getCategoryLabel, getStatusColor, formatDate } from '@/lib/utils/formatters'
+import { getCategoryEmoji, getCategoryLabel, formatDate } from '@/lib/utils/formatters'
 import { motion } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -92,9 +92,7 @@ export function AssetDetailHeader({ asset, onDelete, onTogglePublic }: AssetDeta
       </div>
 
       {/* Notes */}
-      {asset.notes && (
-        <p className="text-sm text-text-secondary mt-4 italic">"{asset.notes}"</p>
-      )}
+      {asset.notes && <p className="text-sm text-text-secondary mt-4 italic">{asset.notes}</p>}
     </motion.div>
   )
 }

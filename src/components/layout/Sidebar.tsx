@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Home, Zap, Cpu, BarChart3 } from 'lucide-react'
+import { Home, Zap, Cpu } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 const navItems = [
