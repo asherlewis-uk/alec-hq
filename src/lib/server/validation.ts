@@ -11,8 +11,24 @@ import type {
   WishlistPriority,
 } from "@/lib/types";
 
-const assetCategories = new Set<AssetCategory>(["VEHICLE", "RIG", "PERIPHERAL", "NETWORK"]);
-const assetStatuses = new Set<AssetStatus>(["ACTIVE", "STORED", "SOLD", "WISHLIST"]);
+export const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export function isValidUUID(id: string): boolean {
+  return UUID_REGEX.test(id);
+}
+
+const assetCategories = new Set<AssetCategory>([
+  "VEHICLE",
+  "RIG",
+  "PERIPHERAL",
+  "NETWORK",
+]);
+const assetStatuses = new Set<AssetStatus>([
+  "ACTIVE",
+  "STORED",
+  "SOLD",
+  "WISHLIST",
+]);
 const componentConditions = new Set<ComponentCondition>([
   "STOCK",
   "UPGRADED",
@@ -20,7 +36,13 @@ const componentConditions = new Set<ComponentCondition>([
   "WORN",
   "FAILED",
 ]);
-const logTypes = new Set<LogType>(["MAINTENANCE", "UPGRADE", "REPAIR", "INSPECTION", "NOTE"]);
+const logTypes = new Set<LogType>([
+  "MAINTENANCE",
+  "UPGRADE",
+  "REPAIR",
+  "INSPECTION",
+  "NOTE",
+]);
 const wishlistPriorities = new Set<WishlistPriority>(["LOW", "MEDIUM", "HIGH"]);
 
 export class ValidationError extends Error {
@@ -118,26 +140,38 @@ export function validateUpdateAssetInput(body: unknown): UpdateAssetInput {
   }
   if (input.category !== undefined) {
     const category = assertString(input.category, "category") as AssetCategory;
-    if (!assetCategories.has(category)) throw new ValidationError("category is invalid");
+    if (!assetCategories.has(category))
+      throw new ValidationError("category is invalid");
     out.category = category;
   }
   if (input.status !== undefined) {
     const status = assertString(input.status, "status") as AssetStatus;
-    if (!assetStatuses.has(status)) throw new ValidationError("status is invalid");
+    if (!assetStatuses.has(status))
+      throw new ValidationError("status is invalid");
     out.status = status;
   }
   if (input.isPublic !== undefined) {
-    if (typeof input.isPublic !== "boolean") throw new ValidationError("isPublic must be a boolean");
+    if (typeof input.isPublic !== "boolean")
+      throw new ValidationError("isPublic must be a boolean");
     out.isPublic = input.isPublic;
   }
-  if (input.coverImage !== undefined) out.coverImage = assertOptionalString(input.coverImage, "coverImage");
-  if (input.purchaseDate !== undefined) out.purchaseDate = assertOptionalString(input.purchaseDate, "purchaseDate");
-  if (input.purchasePrice !== undefined) out.purchasePrice = assertOptionalNumber(input.purchasePrice, "purchasePrice");
-  if (input.notes !== undefined) out.notes = assertOptionalString(input.notes, "notes");
+  if (input.coverImage !== undefined)
+    out.coverImage = assertOptionalString(input.coverImage, "coverImage");
+  if (input.purchaseDate !== undefined)
+    out.purchaseDate = assertOptionalString(input.purchaseDate, "purchaseDate");
+  if (input.purchasePrice !== undefined)
+    out.purchasePrice = assertOptionalNumber(
+      input.purchasePrice,
+      "purchasePrice",
+    );
+  if (input.notes !== undefined)
+    out.notes = assertOptionalString(input.notes, "notes");
   return out;
 }
 
-export function validateCreateComponentInput(body: unknown): CreateComponentInput {
+export function validateCreateComponentInput(
+  body: unknown,
+): CreateComponentInput {
   if (!body || typeof body !== "object") {
     throw new ValidationError("Invalid request payload");
   }
@@ -146,7 +180,10 @@ export function validateCreateComponentInput(body: unknown): CreateComponentInpu
   if (name.length === 0 || name.length > 100) {
     throw new ValidationError("name must be between 1 and 100 characters");
   }
-  const condition = assertString(input.condition, "condition") as ComponentCondition;
+  const condition = assertString(
+    input.condition,
+    "condition",
+  ) as ComponentCondition;
   if (!componentConditions.has(condition)) {
     throw new ValidationError("condition is invalid");
   }
@@ -157,8 +194,15 @@ export function validateCreateComponentInput(body: unknown): CreateComponentInpu
       throw new ValidationError("specs must be an object");
     }
     specs = {};
-    for (const [key, value] of Object.entries(input.specs as Record<string, unknown>)) {
-      if (typeof value === "string") specs[key] = value;
+    for (const [key, value] of Object.entries(
+      input.specs as Record<string, unknown>,
+    )) {
+      if (typeof value !== "string") {
+        throw new ValidationError(
+          `Invalid value for spec "${key}". All spec values must be strings.`,
+        );
+      }
+      specs[key] = value;
     }
   }
 
@@ -199,7 +243,9 @@ export function validateCreateLogInput(body: unknown): CreateAssetLogInput {
   };
 }
 
-export function validateCreateWishlistInput(body: unknown): CreateWishlistInput {
+export function validateCreateWishlistInput(
+  body: unknown,
+): CreateWishlistInput {
   if (!body || typeof body !== "object") {
     throw new ValidationError("Invalid request payload");
   }
@@ -209,7 +255,8 @@ export function validateCreateWishlistInput(body: unknown): CreateWishlistInput 
     throw new ValidationError("name must be between 1 and 100 characters");
   }
   const priority = assertString(input.priority, "priority") as WishlistPriority;
-  if (!wishlistPriorities.has(priority)) throw new ValidationError("priority is invalid");
+  if (!wishlistPriorities.has(priority))
+    throw new ValidationError("priority is invalid");
 
   const url = assertUrl(assertOptionalString(input.url, "url"), "url");
   return {
@@ -217,7 +264,10 @@ export function validateCreateWishlistInput(body: unknown): CreateWishlistInput 
     priority,
     brand: assertOptionalString(input.brand, "brand"),
     url,
-    estimatedPrice: assertOptionalNumber(input.estimatedPrice, "estimatedPrice"),
+    estimatedPrice: assertOptionalNumber(
+      input.estimatedPrice,
+      "estimatedPrice",
+    ),
     notes: assertOptionalString(input.notes, "notes"),
   };
 }
