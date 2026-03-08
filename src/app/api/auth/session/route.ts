@@ -1,8 +1,5 @@
 import { apiOk } from "@/lib/server/api-response";
-import {
-  getCurrentSession,
-  getCurrentWorkspaceSession,
-} from "@/lib/server/auth/session";
+import { getCurrentWorkspaceSession } from "@/lib/server/auth/session";
 
 export const runtime = "nodejs";
 
@@ -18,6 +15,5 @@ export async function GET() {
     });
   }
 
-  const legacySession = await getCurrentSession();
-  return apiOk({ authenticated: Boolean(legacySession) });
+  return apiOk({ authenticated: false });
 }

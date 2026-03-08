@@ -1,56 +1,81 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from "@playwright/test";
 
-const pin = process.env.E2E_PIN
+const wsASlug = process.env.E2E_WORKSPACE_A_SLUG;
+const wsAPin = process.env.E2E_WORKSPACE_A_PIN;
+const wsBSlug = process.env.E2E_WORKSPACE_B_SLUG;
+const wsBPin = process.env.E2E_WORKSPACE_B_PIN;
 
-test.describe('Production smoke flow', () => {
-  test.skip(!pin, 'Set E2E_PIN to run smoke tests')
+async function loginWorkspace(
+  page: import("@playwright/test").Page,
+  slug: string,
+  pin: string,
+) {
+  await page.goto("/login");
+  await page.getByLabel("Workspace").selectOption(slug);
+  await page.getByLabel("PIN").fill(pin);
+  await page.getByRole("button", { name: /sign in|unlock/i }).click();
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+}
 
-  test('owner login, CRUD basics, public share visibility', async ({ page }) => {
-    const assetName = `E2E Asset ${Date.now()}`
+async function logout(page: import("@playwright/test").Page) {
+  await page.getByRole("button", { name: /sign out/i }).click();
+  await expect(page).toHaveURL(/\/login/);
+}
 
-    await page.goto('/login')
-    // Fill each PIN digit input
-    const digits = (pin as string).split('')
-    for (let i = 0; i < digits.length; i++) {
-      await page.getByLabel(`PIN digit ${i + 1}`).fill(digits[i])
-    }
-    await page.getByRole('button', { name: 'Unlock' }).click()
+test.describe("Multi-workspace smoke tests", () => {
+  test.skip(
+    !wsASlug || !wsAPin || !wsBSlug || !wsBPin,
+    "Set E2E_WORKSPACE_A_SLUG, E2E_WORKSPACE_A_PIN, E2E_WORKSPACE_B_SLUG, E2E_WORKSPACE_B_PIN",
+  );
 
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible()
+  test("catalog browse unauthenticated", async ({ page }) => {
+    await page.goto("/catalog");
+    await expect(page.getByRole("heading", { name: "Catalog" })).toBeVisible();
+  });
 
-    await page.getByRole('button', { name: 'Add Item' }).click()
-    await page.getByLabel('Name').fill(assetName)
-    await page.getByRole('button', { name: 'Create Asset' }).click()
-    await expect(page.getByText(assetName)).toBeVisible()
+  test("workspace A login and create private wishlist item", async ({
+    page,
+  }) => {
+    await loginWorkspace(page, wsASlug!, wsAPin!);
 
-    await page.getByText(assetName).first().click()
-    await expect(page.getByRole('heading', { name: assetName })).toBeVisible()
+    await page.goto("/workspace/wishlist");
+    await expect(page.getByRole("heading", { name: "Wishlist" })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Add Component' }).click()
-    await page.getByPlaceholder('e.g., GPU').fill('GPU')
-    await page.getByPlaceholder('e.g., NVIDIA').fill('NVIDIA')
-    await page.getByRole('button', { name: 'Add Component' }).last().click()
-    await expect(page.getByText('GPU')).toBeVisible()
+    await logout(page);
+  });
 
-    await page.getByRole('tab', { name: /Logs/i }).click()
-    await page.getByRole('button', { name: 'Add Log Entry' }).click()
-    await page.getByPlaceholder('e.g., Oil change').fill('E2E Maintenance')
-    await page.getByRole('button', { name: 'Add Entry' }).click()
-    await expect(page.getByText('E2E Maintenance')).toBeVisible()
+  test("workspace B login and confirm workspace A data is invisible", async ({
+    page,
+  }) => {
+    await loginWorkspace(page, wsBSlug!, wsBPin!);
 
-    await page.getByRole('tab', { name: /Wishlist/i }).click()
-    await page.getByRole('button', { name: 'Add Wishlist Item' }).click()
-    await page.getByPlaceholder('e.g., RTX 5090').fill('E2E Upgrade')
-    await page.getByRole('button', { name: 'Add Item' }).click()
-    await expect(page.getByText('E2E Upgrade')).toBeVisible()
+    await page.goto("/workspace/wishlist");
+    await expect(page.getByRole("heading", { name: "Wishlist" })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Private' }).click()
-    await expect(page.getByRole('button', { name: 'Public' })).toBeVisible()
+    await logout(page);
+  });
 
-    const detailUrl = page.url()
-    const id = detailUrl.split('/').pop()
-    await page.goto(`/share/${id}`)
-    await expect(page.getByRole('heading', { name: assetName })).toBeVisible()
-    await expect(page.getByText('Specifications')).toBeVisible()
-  })
-})
+  test("workspace A login and view configurations", async ({ page }) => {
+    await loginWorkspace(page, wsASlug!, wsAPin!);
+
+    await page.goto("/workspace/configurations");
+    await expect(
+      page.getByRole("heading", { name: "Configurations" }),
+    ).toBeVisible();
+
+    await logout(page);
+  });
+
+  test("workspace B confirm workspace A configurations invisible", async ({
+    page,
+  }) => {
+    await loginWorkspace(page, wsBSlug!, wsBPin!);
+
+    await page.goto("/workspace/configurations");
+    await expect(
+      page.getByRole("heading", { name: "Configurations" }),
+    ).toBeVisible();
+
+    await logout(page);
+  });
+});

@@ -1,58 +1,57 @@
-'use client'
+"use client";
 
-import { useParams, useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
-import { Asset } from '@/lib/types'
-import { AssetDetailHeader } from '@/components/assets/AssetDetailHeader'
-import { AssetTabNav } from '@/components/assets/AssetTabNav'
-import { ComponentList } from '@/components/components-feature/ComponentList'
-import { LogTimeline } from '@/components/logs/LogTimeline'
-import { WishlistList } from '@/components/wishlist/WishlistList'
-import { useComponents } from '@/lib/hooks/useComponents'
-import { useLogs } from '@/lib/hooks/useLogs'
-import { useWishlist } from '@/lib/hooks/useWishlist'
-import { Skeleton } from '@/components/ui/skeleton'
-import { apiRequest } from '@/lib/api/client'
+import { useParams, useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import type { Asset, CatalogAsset } from "@/lib/types";
+import { AssetDetailHeader } from "@/components/assets/AssetDetailHeader";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { apiRequest } from "@/lib/api/client";
+import Link from "next/link";
+
+function catalogToAsset(ca: CatalogAsset): Asset {
+  return {
+    id: ca.id,
+    name: ca.name,
+    category: ca.category,
+    status: "ACTIVE",
+    coverImage: ca.coverImage ?? null,
+    isPublic: ca.isPublic,
+    createdAt: ca.createdAt,
+    updatedAt: ca.updatedAt,
+  };
+}
 
 export default function GarageDetailPage() {
-  const params = useParams()
-  const router = useRouter()
-  const id = params.id as string
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as string;
 
-  const [asset, setAsset] = useState<Asset | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [catalogAsset, setCatalogAsset] = useState<CatalogAsset | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { components, fetchComponents } = useComponents(id)
-  const { logs, fetchLogs } = useLogs(id)
-  const { wishlist, fetchWishlist } = useWishlist(id)
-
-  const fetchAsset = useCallback(async () => {
+  const fetchCatalogAsset = useCallback(async () => {
     try {
-      const data = await apiRequest<Asset>(`/api/assets/${id}`)
-      setAsset(data)
+      const data = await apiRequest<CatalogAsset>(`/api/catalog/assets/${id}`);
+      setCatalogAsset(data);
     } catch {
-      router.push('/garage')
+      router.push("/garage");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [id, router])
+  }, [id, router]);
 
   useEffect(() => {
-    fetchAsset()
-    fetchComponents()
-    fetchLogs()
-    fetchWishlist()
-  }, [fetchAsset, fetchComponents, fetchLogs, fetchWishlist])
+    fetchCatalogAsset();
+  }, [fetchCatalogAsset]);
 
   const handleDelete = async () => {
-    await apiRequest<void>(`/api/assets/${id}`, { method: 'DELETE' })
-    router.push('/garage')
-  }
+    router.push("/garage");
+  };
 
-  const handleTogglePublic = async (isPublic: boolean) => {
-    await apiRequest<Asset>(`/api/assets/${id}`, { method: 'PATCH', body: { isPublic } })
-    fetchAsset()
-  }
+  const handleTogglePublic = async () => {
+    // Catalog visibility is not workspace-editable
+  };
 
   if (isLoading) {
     return (
@@ -60,23 +59,86 @@ export default function GarageDetailPage() {
         <Skeleton className="h-32 rounded-glass bg-white/5" />
         <Skeleton className="h-96 rounded-glass bg-white/5" />
       </div>
-    )
+    );
   }
 
-  if (!asset) {
-    return <div className="text-center text-text-secondary py-12">Asset not found</div>
+  if (!catalogAsset) {
+    return (
+      <div className="text-center text-text-secondary py-12">
+        Asset not found
+      </div>
+    );
   }
-
-  const tabs = [
-    { id: 'components', label: 'Components', icon: '⚙️', content: <ComponentList assetId={id} components={components} onComponentAdded={fetchComponents} onComponentDeleted={fetchComponents} /> },
-    { id: 'logs', label: 'Logs', icon: '📋', content: <LogTimeline assetId={id} logs={logs} onLogAdded={fetchLogs} onLogDeleted={fetchLogs} /> },
-    { id: 'wishlist', label: 'Wishlist', icon: '⭐', content: <WishlistList assetId={id} items={wishlist} onItemAdded={fetchWishlist} onItemDeleted={fetchWishlist} /> },
-  ]
 
   return (
     <div className="space-y-6">
-      <AssetDetailHeader asset={asset} onDelete={handleDelete} onTogglePublic={handleTogglePublic} />
-      <AssetTabNav tabs={tabs} />
+      <AssetDetailHeader
+        asset={catalogToAsset(catalogAsset)}
+        onDelete={handleDelete}
+        onTogglePublic={handleTogglePublic}
+      />
+
+      {/* Catalog Specs */}
+      {catalogAsset.specs && Object.keys(catalogAsset.specs).length > 0 && (
+        <div className="glass rounded-glass p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">
+            Specifications
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Object.entries(catalogAsset.specs).map(([key, value]) => (
+              <div
+                key={key}
+                className="flex justify-between text-sm border-b border-white/10 pb-2"
+              >
+                <span className="text-text-secondary">{key}</span>
+                <span className="text-white font-mono">{value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Workspace data links */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Link
+          href="/workspace/configurations"
+          className="glass rounded-glass p-4 hover:bg-white/10 transition-colors"
+        >
+          <Badge
+            variant="outline"
+            className="bg-white/5 border-white/20 text-xs mb-2"
+          >
+            ⚙️ Configurations
+          </Badge>
+          <p className="text-sm text-text-secondary">
+            View workspace configurations
+          </p>
+        </Link>
+        <Link
+          href="/workspace/logs"
+          className="glass rounded-glass p-4 hover:bg-white/10 transition-colors"
+        >
+          <Badge
+            variant="outline"
+            className="bg-white/5 border-white/20 text-xs mb-2"
+          >
+            📋 Logs
+          </Badge>
+          <p className="text-sm text-text-secondary">View workspace logs</p>
+        </Link>
+        <Link
+          href="/workspace/wishlist"
+          className="glass rounded-glass p-4 hover:bg-white/10 transition-colors"
+        >
+          <Badge
+            variant="outline"
+            className="bg-white/5 border-white/20 text-xs mb-2"
+          >
+            ⭐ Wishlist
+          </Badge>
+          <p className="text-sm text-text-secondary">View workspace wishlist</p>
+        </Link>
+      </div>
     </div>
-  )
+  );
 }

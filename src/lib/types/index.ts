@@ -28,19 +28,6 @@ export interface Asset {
   updatedAt: string;
 }
 
-export interface CreateAssetInput {
-  name: string;
-  category: AssetCategory;
-  status: AssetStatus;
-  isPublic: boolean;
-  coverImage?: string | null;
-  purchaseDate?: string | null;
-  purchasePrice?: number | null;
-  notes?: string | null;
-}
-
-export type UpdateAssetInput = Partial<CreateAssetInput>;
-
 export interface Component {
   id: string;
   assetId: string;
@@ -52,16 +39,6 @@ export interface Component {
   installedDate?: string | null;
   notes?: string | null;
   createdAt: string;
-}
-
-export interface CreateComponentInput {
-  name: string;
-  brand?: string | null;
-  model?: string | null;
-  specs?: Record<string, string> | null;
-  condition: ComponentCondition;
-  installedDate?: string | null;
-  notes?: string | null;
 }
 
 export interface AssetLog {
@@ -77,16 +54,6 @@ export interface AssetLog {
   createdAt: string;
 }
 
-export interface CreateAssetLogInput {
-  type: LogType;
-  title: string;
-  description?: string | null;
-  date: string;
-  mileage?: number | null;
-  cost?: number | null;
-  performedBy?: string | null;
-}
-
 export interface WishlistItem {
   id: string;
   assetId: string;
@@ -97,22 +64,6 @@ export interface WishlistItem {
   priority: WishlistPriority;
   notes?: string | null;
   createdAt: string;
-}
-
-export interface CreateWishlistInput {
-  name: string;
-  brand?: string | null;
-  url?: string | null;
-  estimatedPrice?: number | null;
-  priority: WishlistPriority;
-  notes?: string | null;
-}
-
-export interface DashboardStats {
-  totalAssets: number;
-  maintenanceDue: number;
-  wishlistCount: number;
-  recentAssets: Asset[];
 }
 
 export interface ApiErrorPayload {
@@ -148,6 +99,19 @@ export interface WorkspaceAssetLink {
   notes?: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CatalogComponent {
+  id: string;
+  catalogAssetId: string;
+  name: string;
+  brand?: string | null;
+  model?: string | null;
+  specs?: Record<string, string> | null;
+  condition: ComponentCondition;
+  installedDate?: string | null;
+  notes?: string | null;
+  createdAt: string;
 }
 
 export interface WorkspaceConfiguration {

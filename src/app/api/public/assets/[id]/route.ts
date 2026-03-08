@@ -1,8 +1,12 @@
 import { NextRequest } from "next/server";
 import { apiError, apiOk } from "@/lib/server/api-response";
-import { mapAssetRow, mapComponentRow } from "@/lib/server/mappers";
+import {
+  mapCatalogAssetRow,
+  mapCatalogComponentRow,
+} from "@/lib/server/mappers";
 import { getServiceSupabase } from "@/lib/server/supabase";
 import { isValidUUID } from "@/lib/server/validation";
+import type { Asset, Component } from "@/lib/types";
 
 export const runtime = "nodejs";
 
@@ -17,8 +21,8 @@ export async function GET(_request: NextRequest, context: Context) {
   }
   const supabase = getServiceSupabase();
 
-  const { data: asset, error: assetError } = await supabase
-    .from("assets")
+  const { data: catalogAsset, error: assetError } = await supabase
+    .from("catalog_assets")
     .select("*")
     .eq("id", id)
     .eq("is_public", true)
@@ -31,12 +35,12 @@ export async function GET(_request: NextRequest, context: Context) {
       "Failed to fetch public asset.",
       assetError.message,
     );
-  if (!asset) return apiError(404, "NOT_FOUND", "Asset not found.");
+  if (!catalogAsset) return apiError(404, "NOT_FOUND", "Asset not found.");
 
-  const { data: components, error: componentsError } = await supabase
-    .from("components")
+  const { data: catalogComponents, error: componentsError } = await supabase
+    .from("catalog_components")
     .select("*")
-    .eq("asset_id", id)
+    .eq("catalog_asset_id", id)
     .order("created_at", { ascending: false });
 
   if (componentsError)
@@ -47,8 +51,35 @@ export async function GET(_request: NextRequest, context: Context) {
       componentsError.message,
     );
 
-  return apiOk({
-    asset: mapAssetRow(asset),
-    components: (components ?? []).map(mapComponentRow),
+  // Map catalog models to legacy Asset/Component shapes for the public share UI
+  const ca = mapCatalogAssetRow(catalogAsset);
+  const asset: Asset = {
+    id: ca.id,
+    name: ca.name,
+    category: ca.category,
+    status: "ACTIVE",
+    coverImage: ca.coverImage,
+    notes: ca.summary,
+    isPublic: ca.isPublic,
+    createdAt: ca.createdAt,
+    updatedAt: ca.updatedAt,
+  };
+
+  const components: Component[] = (catalogComponents ?? []).map((row) => {
+    const cc = mapCatalogComponentRow(row);
+    return {
+      id: cc.id,
+      assetId: cc.catalogAssetId,
+      name: cc.name,
+      brand: cc.brand,
+      model: cc.model,
+      specs: cc.specs,
+      condition: cc.condition,
+      installedDate: cc.installedDate,
+      notes: cc.notes,
+      createdAt: cc.createdAt,
+    };
   });
+
+  return apiOk({ asset, components });
 }

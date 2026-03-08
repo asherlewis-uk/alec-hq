@@ -1,13 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import {
-  verifySessionToken,
-  verifyWorkspaceSessionToken,
-} from "@/lib/server/auth/token";
+import { verifyWorkspaceSessionToken } from "@/lib/server/auth/token";
 
 const publicPagePrefixes = ["/login", "/share", "/catalog"];
 const publicApiPrefixes = [
-  "/api/auth/pin",
   "/api/auth/workspace/login",
   "/api/auth/session",
   "/api/public",
@@ -29,11 +25,7 @@ function isPublicApi(pathname: string) {
 async function hasValidSession(request: NextRequest): Promise<boolean> {
   const wsToken = request.cookies.get("alec_workspace_session")?.value ?? null;
   const wsSession = await verifyWorkspaceSessionToken(wsToken);
-  if (wsSession) return true;
-
-  const legacyToken = request.cookies.get("alec_session")?.value ?? null;
-  const legacySession = await verifySessionToken(legacyToken);
-  return Boolean(legacySession);
+  return Boolean(wsSession);
 }
 
 export async function proxy(request: NextRequest) {

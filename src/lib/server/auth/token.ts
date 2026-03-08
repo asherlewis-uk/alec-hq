@@ -1,11 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
 
-interface SessionPayload {
-  role: "owner";
-  iat: number;
-  exp: number;
-}
-
 const encoder = new TextEncoder();
 
 function getSessionSecret() {
@@ -60,47 +54,7 @@ async function signMessage(message: string, secret: string): Promise<string> {
   return toBase64Url(new Uint8Array(signature));
 }
 
-export async function createSessionToken(now = Date.now()): Promise<string> {
-  const ttlHours = Number(process.env.SESSION_TTL_HOURS ?? "12");
-  const issuedAtSec = Math.floor(now / 1000);
-  const payload: SessionPayload = {
-    role: "owner",
-    iat: issuedAtSec,
-    exp: issuedAtSec + Math.max(1, ttlHours) * 60 * 60,
-  };
-  const payloadEncoded = toBase64Url(encoder.encode(JSON.stringify(payload)));
-  const secret = getSessionSecret();
-  const signature = await signMessage(payloadEncoded, secret);
-  return `${payloadEncoded}.${signature}`;
-}
-
-export async function verifySessionToken(
-  token?: string | null,
-): Promise<SessionPayload | null> {
-  if (!token) return null;
-  const [payloadEncoded, signature] = token.split(".");
-  if (!payloadEncoded || !signature) return null;
-
-  const secret = getSessionSecret();
-  const expected = await signMessage(payloadEncoded, secret);
-  const sigBuf = Buffer.from(signature, "base64url");
-  const expBuf = Buffer.from(expected, "base64url");
-  if (sigBuf.length !== expBuf.length || !timingSafeEqual(sigBuf, expBuf)) {
-    return null;
-  }
-
-  try {
-    const payloadJson = new TextDecoder().decode(fromBase64Url(payloadEncoded));
-    const payload = JSON.parse(payloadJson) as SessionPayload;
-    if (payload.role !== "owner") return null;
-    if (payload.exp < Math.floor(Date.now() / 1000)) return null;
-    return payload;
-  } catch {
-    return null;
-  }
-}
-
-// ─── Workspace Session Tokens (Phase 3) ─────────────────────
+// ─── Workspace Session Tokens ────────────────────────────────
 
 export interface WorkspaceSessionPayload {
   role: "workspace_member";
