@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { verifySessionToken } from "@/lib/server/auth/token";
 
 const publicPagePrefixes = ["/login", "/share"];
-const publicApiPrefixes = ["/api/auth/passcode", "/api/public"];
+const publicApiPrefixes = ["/api/auth/pin", "/api/public"];
 
 function isPublicPage(pathname: string) {
   return publicPagePrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));

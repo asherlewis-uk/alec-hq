@@ -1,16 +1,20 @@
 import { expect, test } from '@playwright/test'
 
-const passcode = process.env.E2E_PASSCODE
+const pin = process.env.E2E_PIN
 
 test.describe('Production smoke flow', () => {
-  test.skip(!passcode, 'Set E2E_PASSCODE to run smoke tests')
+  test.skip(!pin, 'Set E2E_PIN to run smoke tests')
 
   test('owner login, CRUD basics, public share visibility', async ({ page }) => {
     const assetName = `E2E Asset ${Date.now()}`
 
     await page.goto('/login')
-    await page.getByLabel('Passcode').fill(passcode as string)
-    await page.getByRole('button', { name: 'Sign in' }).click()
+    // Fill each PIN digit input
+    const digits = (pin as string).split('')
+    for (let i = 0; i < digits.length; i++) {
+      await page.getByLabel(`PIN digit ${i + 1}`).fill(digits[i])
+    }
+    await page.getByRole('button', { name: 'Unlock' }).click()
 
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible()
 

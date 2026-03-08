@@ -21,7 +21,3 @@ export function getServiceSupabase() {
 export function getSessionSecret() {
   return getRequiredEnv("SESSION_SECRET");
 }
-
-export function getPasscodeHash() {
-  return getRequiredEnv("APP_PASSCODE_HASH");
-}

@@ -189,27 +189,21 @@ export type Database = {
           },
         ];
       };
-      auth_attempts: {
+      app_pin: {
         Row: {
-          ip_hash: string;
-          window_start: string;
-          attempt_count: number;
-          blocked_until: string | null;
-          updated_at: string;
+          id: boolean;
+          pin_hash: string;
+          created_at: string;
         };
         Insert: {
-          ip_hash: string;
-          window_start?: string;
-          attempt_count?: number;
-          blocked_until?: string | null;
-          updated_at?: string;
+          id?: boolean;
+          pin_hash: string;
+          created_at?: string;
         };
         Update: {
-          ip_hash?: string;
-          window_start?: string;
-          attempt_count?: number;
-          blocked_until?: string | null;
-          updated_at?: string;
+          id?: boolean;
+          pin_hash?: string;
+          created_at?: string;
         };
         Relationships: [];
       };
@@ -218,19 +212,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      increment_failed_attempt: {
-        Args: {
-          p_ip_hash: string;
-          p_window_minutes: number;
-          p_block_minutes: number;
-          p_max_attempts: number;
-        };
-        Returns: {
-          attempt_count: number;
-          is_blocked: boolean;
-          blocked_until: string | null;
-        }[];
-      };
+      [_ in never]: never;
     };
     Enums: {
       asset_category: "VEHICLE" | "RIG" | "PERIPHERAL" | "NETWORK";

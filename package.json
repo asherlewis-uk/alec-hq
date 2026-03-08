@@ -10,8 +10,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "ci": "npm run lint && npm run typecheck && npm run build",
-    "test:smoke": "playwright test -c playwright.config.ts",
-    "hash:passcode": "node scripts/hash-passcode.mjs"
+    "test:smoke": "playwright test -c playwright.config.ts"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.0.2",
