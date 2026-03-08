@@ -1,11 +1,19 @@
 import { createHash } from "node:crypto";
 import { getServiceSupabase, getSessionSecret } from "@/lib/server/supabase";
 
-const WINDOW_MINUTES = Number(
-  process.env.AUTH_RATE_LIMIT_WINDOW_MINUTES ?? "15",
-);
-const BLOCK_MINUTES = Number(process.env.AUTH_RATE_LIMIT_BLOCK_MINUTES ?? "15");
-const MAX_ATTEMPTS = Number(process.env.AUTH_RATE_LIMIT_MAX_ATTEMPTS ?? "5");
+function parseEnvInt(key: string, defaultValue: string): number {
+  const val = Number(process.env[key] ?? defaultValue);
+  if (Number.isNaN(val) || val <= 0) {
+    throw new Error(
+      `CRITICAL: Invalid environment variable for ${key}. Must be a positive number.`,
+    );
+  }
+  return val;
+}
+
+const WINDOW_MINUTES = parseEnvInt("AUTH_RATE_LIMIT_WINDOW_MINUTES", "15");
+const BLOCK_MINUTES = parseEnvInt("AUTH_RATE_LIMIT_BLOCK_MINUTES", "15");
+const MAX_ATTEMPTS = parseEnvInt("AUTH_RATE_LIMIT_MAX_ATTEMPTS", "5");
 
 function nowMs() {
   return Date.now();

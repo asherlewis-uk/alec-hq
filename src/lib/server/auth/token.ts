@@ -1,3 +1,5 @@
+import { timingSafeEqual } from "node:crypto";
+
 interface SessionPayload {
   role: "owner";
   iat: number;
@@ -20,7 +22,10 @@ function toBase64Url(bytes: Uint8Array): string {
   }
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  return btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
 }
 
 function fromBase64Url(value: string): Uint8Array {
@@ -36,15 +41,22 @@ function fromBase64Url(value: string): Uint8Array {
 }
 
 async function importHmacKey(secret: string) {
-  return crypto.subtle.importKey("raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, [
-    "sign",
-    "verify",
-  ]);
+  return crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"],
+  );
 }
 
 async function signMessage(message: string, secret: string): Promise<string> {
   const key = await importHmacKey(secret);
-  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(message));
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    encoder.encode(message),
+  );
   return toBase64Url(new Uint8Array(signature));
 }
 
@@ -62,14 +74,20 @@ export async function createSessionToken(now = Date.now()): Promise<string> {
   return `${payloadEncoded}.${signature}`;
 }
 
-export async function verifySessionToken(token?: string | null): Promise<SessionPayload | null> {
+export async function verifySessionToken(
+  token?: string | null,
+): Promise<SessionPayload | null> {
   if (!token) return null;
   const [payloadEncoded, signature] = token.split(".");
   if (!payloadEncoded || !signature) return null;
 
   const secret = getSessionSecret();
   const expected = await signMessage(payloadEncoded, secret);
-  if (signature !== expected) return null;
+  const sigBuf = Buffer.from(signature, "base64url");
+  const expBuf = Buffer.from(expected, "base64url");
+  if (sigBuf.length !== expBuf.length || !timingSafeEqual(sigBuf, expBuf)) {
+    return null;
+  }
 
   try {
     const payloadJson = new TextDecoder().decode(fromBase64Url(payloadEncoded));
