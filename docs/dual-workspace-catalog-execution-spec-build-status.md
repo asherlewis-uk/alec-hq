@@ -364,26 +364,11 @@ Phase 4 delivers the complete new route surface. Four catalog read routes provid
 
 ---
 
-### Delta
-
-| Metric          | Value |
-| --------------- | ----- |
-| Files created   | —     |
-| Files modified  | —     |
-| Files deleted   | —     |
-| Lines added     | —     |
-| Lines removed   | —     |
-| Net line change | —     |
-
-### Reflection
-
----
-
 ## Phase 5 — Client & UI Migration
 
-**Status: NOT STARTED**
-**Agent:** —
-**Date completed:** —
+**Status: COMPLETE**
+**Agent: Default**
+**Date completed: 2026-03-08**
 
 ### Scope
 
@@ -396,34 +381,79 @@ Phase 4 delivers the complete new route surface. Four catalog read routes provid
 
 ### Implementation Log
 
-| Action | File | Lines ± | Notes |
-| ------ | ---- | ------- | ----- |
-| —      | —    | —       | —     |
+| Action   | File                                               | Lines ± | Notes                                                                                                                                              |
+| -------- | -------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Created  | `src/lib/hooks/useCatalogAssets.ts`                | +47     | CATALOG_SHARED. Calls `GET /api/catalog/assets`. No workspace context. Supports category and search filters.                                       |
+| Created  | `src/lib/hooks/useWorkspaceAssets.ts`              | +93     | OVERLAY_STRUCTURE. Calls `/api/workspace/assets` CRUD. Returns `WorkspaceAssetView` (link + catalog asset join).                                   |
+| Created  | `src/lib/hooks/useWorkspaceLogs.ts`                | +57     | WORKSPACE_PRIVATE. Calls `GET/POST /api/workspace/logs`. Server enforces `workspace_id`.                                                           |
+| Created  | `src/lib/hooks/useWorkspaceWishlist.ts`            | +60     | WORKSPACE_PRIVATE. Calls `GET/POST /api/workspace/wishlist`. Server enforces `workspace_id`.                                                       |
+| Created  | `src/lib/hooks/useWorkspaceConfigurations.ts`      | +66     | WORKSPACE_PRIVATE. Calls `GET/POST /api/workspace/configurations`. Server enforces `workspace_id`.                                                 |
+| Created  | `src/app/(root)/catalog/page.tsx`                  | +137    | CATALOG_SHARED. Catalog browse with category filters, search, and card grid. Public-accessible.                                                    |
+| Created  | `src/app/(root)/workspace/wishlist/page.tsx`       | +75     | WORKSPACE_PRIVATE. Workspace wishlist list with priority badges and pricing.                                                                       |
+| Created  | `src/app/(root)/workspace/logs/page.tsx`           | +79     | WORKSPACE_PRIVATE. Workspace logs timeline with type badges, date, mileage, cost.                                                                  |
+| Created  | `src/app/(root)/workspace/configurations/page.tsx` | +63     | WORKSPACE_PRIVATE. Workspace configurations grid with kind badges and notes.                                                                       |
+| Modified | `src/app/login/page.tsx`                           | +36     | Replaced single-tenant PIN-only form with workspace-select step + PIN entry step. POSTs to `/api/auth/workspace/login`.                            |
+| Modified | `src/lib/store/useAppStore.ts`                     | +11     | Added `currentWorkspace: WorkspaceSummary` and `setCurrentWorkspace`. Legacy asset store retained for backward compatibility.                      |
+| Modified | `src/components/dashboard/Dashboard.tsx`           | +17     | Replaced legacy `useAssets` with `useWorkspaceAssets`, `useWorkspaceLogs`, `useWorkspaceWishlist`, `useWorkspaceConfigurations`. 4-card stat grid. |
+| Modified | `src/components/layout/Sidebar.tsx`                | +5      | Added Catalog, Configurations, Wishlist, Logs nav items. Added workspace name in footer. Imported `useAppStore`.                                   |
+| Modified | `src/components/layout/TopBar.tsx`                 | +3      | Added path labels for new workspace routes.                                                                                                        |
+| Modified | `src/components/layout/AppShell.tsx`               | +23     | Fetches `/api/auth/session` on mount and sets `currentWorkspace` in store.                                                                         |
+
+### Boundary Guard Result
+
+**PASS** — all four enforcement layers and triple scenario validation passed.
+
+Classification inventory:
+
+| Classification      | Count | Artifacts                                                                                                                                                   |
+| ------------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CATALOG_SHARED`    | 2     | `useCatalogAssets` hook, `/catalog` page                                                                                                                    |
+| `WORKSPACE_PRIVATE` | 5     | `useWorkspaceLogs`, `useWorkspaceWishlist`, `useWorkspaceConfigurations` hooks, `/workspace/logs`, `/workspace/wishlist`, `/workspace/configurations` pages |
+| `OVERLAY_STRUCTURE` | 1     | `useWorkspaceAssets` hook                                                                                                                                   |
+| `CLIENT_ONLY`       | 5     | login page, store, Dashboard, Sidebar, TopBar, AppShell                                                                                                     |
+| `UNKNOWN`           | **0** | —                                                                                                                                                           |
+
+Enforcement layers:
+
+| Layer                                        | Result         |
+| -------------------------------------------- | -------------- |
+| Layer 1 — Pre-Commit Classification Scan     | **PASS**       |
+| Layer 2 — Schema AST Inspection              | **N/A (PASS)** |
+| Layer 3 — Query Isolation Static Analysis    | **PASS**       |
+| Layer 4 — Automatic Workspace Leak Detection | **PASS**       |
+
+Scenarios:
+
+| Scenario                 | Result   |
+| ------------------------ | -------- |
+| A — Catalog Integrity    | **PASS** |
+| B — Workspace Isolation  | **PASS** |
+| C — Boundary Interaction | **PASS** |
 
 ### Validation Checklist
 
-- [ ] Catalog browsable without leaking private data.
-- [ ] User sees only their own workspace data after sign-in.
-- [ ] Dashboard counts differ between workspace A and workspace B.
-- [ ] Navigation routes resolve correctly.
-- [ ] `npm run lint` passes.
-- [ ] `npm run typecheck` passes.
-- [ ] `npm run build` passes.
+- [x] Catalog browsable without leaking private data.
+- [x] User sees only their own workspace data after sign-in.
+- [x] Dashboard counts differ between workspace A and workspace B.
+- [x] Navigation routes resolve correctly.
+- [x] `npm run lint` passes.
+- [x] `npm run typecheck` passes.
+- [x] `npm run build` passes.
 
 ### Delta
 
 | Metric          | Value |
 | --------------- | ----- |
-| Files created   | —     |
-| Files modified  | —     |
-| Files deleted   | —     |
-| Lines added     | —     |
-| Lines removed   | —     |
-| Net line change | —     |
+| Files created   | 9     |
+| Files modified  | 6     |
+| Files deleted   | 0     |
+| Lines added     | 772   |
+| Lines removed   | 140   |
+| Net line change | +632  |
 
 ### Reflection
 
----
+Phase 5 delivers the full client-side migration from single-tenant to dual-workspace architecture. The login form now presents a workspace selection step before PIN entry, posting to the Phase 3 workspace login endpoint. Five new hooks replace the legacy global `useAssets` pattern — each hook calls its corresponding Phase 4 API route, and all workspace scoping is enforced server-side. The Zustand store gains `currentWorkspace` state populated from the session endpoint on AppShell mount. The Dashboard now shows four workspace-scoped stat cards (linked assets, configurations, wishlist, logs) instead of the legacy three-card global layout. Four new pages provide dedicated UI for catalog browsing, workspace configurations, workspace wishlist, and workspace logs. The Sidebar navigation was extended with all new routes and displays the active workspace name. No schema, migration, server route, auth helper, mapper, or validation file was modified — all server-side enforcement was in place from Phases 3–4. Legacy hooks and routes remain intact for Phase 6 decommissioning. TypeScript compilation, ESLint, and `next build` all pass with zero errors.
 
 ## Phase 6 — Legacy Decommissioning
 
@@ -475,16 +505,16 @@ Phase 4 delivers the complete new route surface. Four catalog read routes provid
 
 ## Cumulative Ledger
 
-| Phase     | Files Created | Files Modified | Files Deleted | Lines Added | Lines Removed | Net |
-| --------- | ------------- | -------------- | ------------- | ----------- | ------------- | --- |
-| 0         | 0             | 0              | 0             | 0           | 0             | 0   |
-| 1         | —             | —              | —             | —           | —             | —   |
-| 2         | —             | —              | —             | —           | —             | —   |
-| 3         | —             | —              | —             | —           | —             | —   |
-| 4         | —             | —              | —             | —           | —             | —   |
-| 5         | —             | —              | —             | —           | —             | —   |
-| 6         | —             | —              | —             | —           | —             | —   |
-| **Total** | —             | —              | —             | —           | —             | —   |
+| Phase     | Files Created | Files Modified | Files Deleted | Lines Added | Lines Removed | Net        |
+| --------- | ------------- | -------------- | ------------- | ----------- | ------------- | ---------- |
+| 0         | 0             | 0              | 0             | 0           | 0             | 0          |
+| 1         | 1             | 3              | 0             | 1 001       | 0             | +1 001     |
+| 2         | 0             | 1              | 0             | 17          | 0             | +17        |
+| 3         | 3             | 6              | 0             | 306         | 0             | +306       |
+| 4         | 12            | 1              | 0             | 1 150       | 0             | +1 150     |
+| 5         | 9             | 6              | 0             | 772         | 140           | +632       |
+| 6         | —             | —              | —             | —           | —             | —          |
+| **Total** | **25**        | **17**         | **0**         | **3 246**   | **140**       | **+3 106** |
 
 ---
 
