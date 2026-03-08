@@ -281,3 +281,28 @@ values
   ('asher', 'Asher Workspace'),
   ('alec', 'Alec Workspace')
 on conflict (slug) do nothing;
+
+-- =============================================================
+-- CATALOG_SHARED: Backfill legacy assets into catalog_assets
+-- =============================================================
+insert into public.catalog_assets (
+  id,
+  name,
+  category,
+  cover_image,
+  summary,
+  is_public,
+  created_at,
+  updated_at
+)
+select
+  a.id,
+  a.name,
+  a.category,
+  a.cover_image,
+  a.notes,
+  coalesce(a.is_public, true),
+  a.created_at,
+  a.updated_at
+from public.assets a
+on conflict (id) do nothing;

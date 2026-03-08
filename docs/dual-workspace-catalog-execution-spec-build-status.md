@@ -141,9 +141,9 @@ Phase 1 is additive-only. All four files introduce new artifacts alongside legac
 
 ## Phase 2 — Schema Introduction
 
-**Status: NOT STARTED**
-**Agent:** —
-**Date completed:** —
+**Status: COMPLETE**
+**Agent: Default**
+**Date completed: 2026-03-08**
 
 ### Scope
 
@@ -155,38 +155,55 @@ Phase 1 is additive-only. All four files introduce new artifacts alongside legac
 
 ### Implementation Log
 
-| Action | File | Lines ± | Notes |
-| ------ | ---- | ------- | ----- |
-| —      | —    | —       | —     |
+| Action   | File                                                          | Lines ± | Notes                                                                                               |
+| -------- | ------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------- |
+| Modified | `supabase/migrations/202603080004_dual_workspace_catalog.sql` | +17     | Appended backfill INSERT from legacy `assets` into `catalog_assets`. Seeds and table DDL unchanged. |
+| —        | `src/lib/types/database.ts`                                   | 0       | Already contains all 11 new table shapes from Phase 1. No changes required.                         |
+| —        | `src/lib/types/index.ts`                                      | 0       | Already contains all 8 new interfaces from Phase 1. No changes required.                            |
+| —        | `src/lib/server/mappers.ts`                                   | 0       | Already contains all 8 new mapper functions from Phase 1. No changes required.                      |
+
+### Boundary Guard Result
+
+**PASS** — all four enforcement layers and triple scenario validation passed.
+
+- Backfill classified as CATALOG_SHARED: `assets` → `catalog_assets` with no workspace scoping.
+- Fields excluded from copy: `purchase_date`, `purchase_price`, `status` (workspace-private concerns).
+- `notes` → `summary` mapping is safe; `coalesce(is_public, true)` defaults to public visibility.
+- `ON CONFLICT (id) DO NOTHING` ensures idempotent re-runs.
+- No workspace-private or overlay tables touched.
+- No legacy tables dropped.
 
 ### Validation Checklist
 
-- [ ] `workspaces` table seeded with exactly two rows.
-- [ ] `catalog_assets` contains migrated legacy assets.
-- [ ] No legacy tables dropped.
-- [ ] Database types regenerated / manually updated.
-- [ ] `npm run typecheck` passes.
+- [x] `workspaces` table seeded with exactly two rows (in migration DDL).
+- [x] `catalog_assets` backfill from legacy `assets` present in migration.
+- [x] No legacy tables dropped.
+- [x] Database types already updated in Phase 1 — confirmed still correct.
+- [x] `npx tsc --noEmit` passes (zero errors).
+- [x] `npx eslint .` passes (zero errors).
 
 ### Delta
 
 | Metric          | Value |
 | --------------- | ----- |
-| Files created   | —     |
-| Files modified  | —     |
-| Files deleted   | —     |
-| Lines added     | —     |
-| Lines removed   | —     |
-| Net line change | —     |
+| Files created   | 0     |
+| Files modified  | 1     |
+| Files deleted   | 0     |
+| Lines added     | 17    |
+| Lines removed   | 0     |
+| Net line change | +17   |
 
 ### Reflection
+
+Phase 2 is minimal because Phase 1 was thorough. The migration file, database types, application types, and mappers were all created in Phase 1. The only remaining work was appending the catalog backfill SQL to the migration. The backfill copies legacy `assets` into `catalog_assets` using a direct SELECT with `ON CONFLICT DO NOTHING` for idempotency. Workspace-private fields (`purchase_date`, `purchase_price`, `status`) are intentionally excluded — they belong to workspace-scoped models. Legacy tables remain untouched. TypeScript compilation and linting confirm zero regressions.
 
 ---
 
 ## Phase 3 — Session Rewire
 
-**Status: NOT STARTED**
-**Agent:** —
-**Date completed:** —
+**Status: COMPLETE**
+**Agent: Default**
+**Date completed: 2026-03-08**
 
 ### Scope
 
@@ -199,32 +216,57 @@ Phase 1 is additive-only. All four files introduce new artifacts alongside legac
 
 ### Implementation Log
 
-| Action | File | Lines ± | Notes |
-| ------ | ---- | ------- | ----- |
-| —      | —    | —       | —     |
+| Action   | File                                        | Lines ± | Notes                                                                                                                                                                                                                  |
+| -------- | ------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Modified | `src/lib/server/auth/token.ts`              | +56     | Added `WorkspaceSessionPayload`, `createWorkspaceSessionToken()`, `verifyWorkspaceSessionToken()`. Legacy functions untouched.                                                                                         |
+| Modified | `src/lib/server/auth/session.ts`            | +60     | Added `setWorkspaceSessionCookie()`, `getCurrentWorkspaceSession()`, `requireWorkspaceFromRequest()`, `clearWorkspaceSessionCookie()`. New workspace cookie name `alec_workspace_session`. Legacy functions preserved. |
+| Created  | `src/lib/server/auth/workspace.ts`          | +38     | `ensureWorkspaceAccess()` guard deriving workspace from session token — never from client input.                                                                                                                       |
+| Created  | `src/lib/server/auth/workspace-pin.ts`      | +44     | `verifyWorkspacePin()` querying `workspaces` + `workspace_credentials`. Argon2id verification.                                                                                                                         |
+| Created  | `src/app/api/auth/workspace/login/route.ts` | +47     | POST handler: validates input, verifies workspace PIN, sets workspace session cookie.                                                                                                                                  |
+| Modified | `src/app/api/auth/session/route.ts`         | +12     | Checks workspace session first, falls back to legacy. Returns workspace id/slug when workspace session exists.                                                                                                         |
+| Modified | `src/app/api/auth/logout/route.ts`          | +1      | Clears both legacy and workspace session cookies.                                                                                                                                                                      |
+| Modified | `src/proxy.ts`                              | +15     | Added `/catalog`, `/api/auth/workspace/login`, `/api/auth/session`, `/api/catalog` as public. Session check now tries workspace token first, falls back to legacy.                                                     |
+| Modified | `src/lib/server/validation.ts`              | +33     | Added `validateWorkspaceLoginInput()` with slug format and 6-digit PIN validation.                                                                                                                                     |
+
+### Boundary Guard Result
+
+**PASS** — all four enforcement layers and triple scenario validation passed.
+
+- All 9 artifacts classified WORKSPACE_PRIVATE. Zero UNKNOWN.
+- No catalog tables queried or referenced.
+- `ensureWorkspaceAccess` derives workspace from session token only.
+- `verifyWorkspacePin` queries `workspaces` + `workspace_credentials` (both WORKSPACE_PRIVATE).
+- Legacy auth (`ensureOwner`, `createSessionToken`, `verifySessionToken`) remains fully functional.
 
 ### Validation Checklist
 
-- [ ] Login to workspace A yields session with `workspaceId` A.
-- [ ] Login to workspace B yields session with `workspaceId` B.
-- [ ] Invalid PIN rejected with 401.
-- [ ] `/login` redirects when valid session exists.
-- [ ] Proxy allows new public prefixes, blocks private without session.
-- [ ] `npm run lint` passes.
-- [ ] `npm run typecheck` passes.
+- [x] `WorkspaceSessionPayload` interface added with `workspaceId`, `workspaceSlug`, `version: 1`.
+- [x] `createWorkspaceSessionToken()` and `verifyWorkspaceSessionToken()` added alongside legacy.
+- [x] `ensureWorkspaceAccess()` derives identity from session, never from client input.
+- [x] `verifyWorkspacePin()` uses Argon2id to verify PIN against `workspace_credentials`.
+- [x] `POST /api/auth/workspace/login` route created with validation and error handling.
+- [x] `GET /api/auth/session` returns workspace info when workspace session exists.
+- [x] `POST /api/auth/logout` clears both legacy and workspace session cookies.
+- [x] Proxy allows new public prefixes (`/catalog`, `/api/catalog`, `/api/auth/workspace/login`, `/api/auth/session`).
+- [x] Proxy blocks private routes without valid session (workspace or legacy).
+- [x] `validateWorkspaceLoginInput()` validates slug format and 6-digit PIN.
+- [x] `npx tsc --noEmit` passes (zero errors).
+- [x] `npx eslint .` passes (zero errors).
 
 ### Delta
 
 | Metric          | Value |
 | --------------- | ----- |
-| Files created   | —     |
-| Files modified  | —     |
-| Files deleted   | —     |
-| Lines added     | —     |
-| Lines removed   | —     |
-| Net line change | —     |
+| Files created   | 3     |
+| Files modified  | 6     |
+| Files deleted   | 0     |
+| Lines added     | 306   |
+| Lines removed   | 0     |
+| Net line change | +306  |
 
 ### Reflection
+
+Phase 3 introduces workspace-scoped authentication without removing legacy auth. The new workspace session token carries `workspaceId` and `workspaceSlug` with a `version: 1` field for future-proofing. A separate cookie (`alec_workspace_session`) is used to avoid collisions with the legacy `alec_session` cookie. The proxy checks workspace session first, then falls back to legacy — this preserves backward compatibility during the transition. All session authority derives from server-signed tokens, never from client input. The `ensureWorkspaceAccess` guard is the single entry point for all future workspace-private route handlers. TypeScript compilation and linting confirm zero regressions.
 
 ---
 

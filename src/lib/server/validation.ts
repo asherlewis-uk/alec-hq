@@ -271,3 +271,37 @@ export function validateCreateWishlistInput(
     notes: assertOptionalString(input.notes, "notes"),
   };
 }
+
+// ─── Workspace Login Validator (Phase 3) ────────────────────
+
+export interface WorkspaceLoginInput {
+  workspaceSlug: string;
+  pin: string;
+}
+
+export function validateWorkspaceLoginInput(
+  body: unknown,
+): WorkspaceLoginInput {
+  if (!body || typeof body !== "object") {
+    throw new ValidationError("Invalid request payload");
+  }
+
+  const input = body as Record<string, unknown>;
+  const workspaceSlug = assertString(
+    input.workspaceSlug,
+    "workspaceSlug",
+  ).toLowerCase();
+  const pin = assertString(input.pin, "pin");
+
+  if (!/^[a-z0-9-]{3,32}$/.test(workspaceSlug)) {
+    throw new ValidationError(
+      "workspaceSlug must be 3-32 characters of lowercase letters, digits, or hyphens",
+    );
+  }
+
+  if (!/^\d{6}$/.test(pin)) {
+    throw new ValidationError("PIN must be exactly 6 digits");
+  }
+
+  return { workspaceSlug, pin };
+}
