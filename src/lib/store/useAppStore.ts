@@ -1,14 +1,16 @@
-import { create } from 'zustand'
-import type { Asset } from '@/lib/types'
+import { create } from "zustand";
+import type { Asset } from "@/lib/types";
 
 interface AppStore {
-  assets: Asset[]
-  setAssets: (assets: Asset[]) => void
-  addAsset: (asset: Asset) => void
-  updateAsset: (id: string, asset: Partial<Asset>) => void
-  deleteAsset: (id: string) => void
-  isLoading: boolean
-  setIsLoading: (loading: boolean) => void
+  assets: Asset[];
+  setAssets: (assets: Asset[]) => void;
+  addAsset: (asset: Asset) => void;
+  updateAsset: (id: string, asset: Partial<Asset>) => void;
+  deleteAsset: (id: string) => void;
+  isLoading: boolean;
+  setIsLoading: (loading: boolean) => void;
+  error: string | null;
+  setError: (error: string | null) => void;
 }
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -25,4 +27,6 @@ export const useAppStore = create<AppStore>((set) => ({
     })),
   isLoading: false,
   setIsLoading: (loading) => set({ isLoading: loading }),
-}))
+  error: null,
+  setError: (error) => set({ error }),
+}));

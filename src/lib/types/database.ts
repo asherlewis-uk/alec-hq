@@ -1,4 +1,10 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
 
 export type Database = {
   public: {
@@ -89,7 +95,7 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "assets";
             referencedColumns: ["id"];
-          }
+          },
         ];
       };
       asset_logs: {
@@ -136,7 +142,7 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "assets";
             referencedColumns: ["id"];
-          }
+          },
         ];
       };
       wishlist_items: {
@@ -180,7 +186,7 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "assets";
             referencedColumns: ["id"];
-          }
+          },
         ];
       };
       auth_attempts: {
@@ -212,12 +218,29 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      increment_failed_attempt: {
+        Args: {
+          p_ip_hash: string;
+          p_window_minutes: number;
+          p_block_minutes: number;
+          p_max_attempts: number;
+        };
+        Returns: {
+          attempt_count: number;
+          is_blocked: boolean;
+          blocked_until: string | null;
+        }[];
+      };
     };
     Enums: {
       asset_category: "VEHICLE" | "RIG" | "PERIPHERAL" | "NETWORK";
       asset_status: "ACTIVE" | "STORED" | "SOLD" | "WISHLIST";
-      component_condition: "STOCK" | "UPGRADED" | "AFTERMARKET" | "WORN" | "FAILED";
+      component_condition:
+        | "STOCK"
+        | "UPGRADED"
+        | "AFTERMARKET"
+        | "WORN"
+        | "FAILED";
       log_type: "MAINTENANCE" | "UPGRADE" | "REPAIR" | "INSPECTION" | "NOTE";
       wishlist_priority: "LOW" | "MEDIUM" | "HIGH";
     };

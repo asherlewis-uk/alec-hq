@@ -1,60 +1,70 @@
-'use client'
+"use client";
 
-import { ReactNode, useState } from 'react'
+import { ReactNode, useRef, useState } from "react";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/sheet'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { useAssets } from '@/lib/hooks/useAssets'
-import { AssetCategory } from '@/lib/types'
+} from "@/components/ui/select";
+import { useAssets } from "@/lib/hooks/useAssets";
+import { AssetCategory } from "@/lib/types";
 
 interface QuickAddSheetProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  children: ReactNode
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children: ReactNode;
 }
 
-export function QuickAddSheet({ open, onOpenChange, children }: QuickAddSheetProps) {
-  const [name, setName] = useState('')
-  const [category, setCategory] = useState<AssetCategory>('RIG')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitError, setSubmitError] = useState<string | null>(null)
-  const { createAsset } = useAssets()
+export function QuickAddSheet({
+  open,
+  onOpenChange,
+  children,
+}: QuickAddSheetProps) {
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState<AssetCategory>("RIG");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const { createAsset } = useAssets();
+  const submittingRef = useRef(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!name.trim()) return
+    e.preventDefault();
+    if (!name.trim()) return;
+    if (submittingRef.current) return;
 
-    setIsSubmitting(true)
-    setSubmitError(null)
+    submittingRef.current = true;
+    setIsSubmitting(true);
+    setSubmitError(null);
     try {
       await createAsset({
         name,
         category,
-        status: 'ACTIVE',
+        status: "ACTIVE",
         isPublic: false,
-      })
-      setName('')
-      setCategory('RIG')
-      onOpenChange(false)
+      });
+      setName("");
+      setCategory("RIG");
+      onOpenChange(false);
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Failed to create asset')
+      setSubmitError(
+        error instanceof Error ? error.message : "Failed to create asset",
+      );
     } finally {
-      setIsSubmitting(false)
+      submittingRef.current = false;
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -80,7 +90,10 @@ export function QuickAddSheet({ open, onOpenChange, children }: QuickAddSheetPro
 
           <div>
             <label className="text-sm font-medium text-white">Category</label>
-            <Select value={category} onValueChange={(v) => setCategory(v as AssetCategory)}>
+            <Select
+              value={category}
+              onValueChange={(v) => setCategory(v as AssetCategory)}
+            >
               <SelectTrigger className="mt-1 bg-white/10 border-white/20 text-white">
                 <SelectValue />
               </SelectTrigger>
@@ -98,11 +111,11 @@ export function QuickAddSheet({ open, onOpenChange, children }: QuickAddSheetPro
             disabled={isSubmitting || !name.trim()}
             className="w-full bg-accent hover:bg-accent/90 text-black rounded-glass"
           >
-            {isSubmitting ? 'Creating...' : 'Create Asset'}
+            {isSubmitting ? "Creating..." : "Create Asset"}
           </Button>
           {submitError && <p className="text-red-300 text-sm">{submitError}</p>}
         </form>
       </SheetContent>
     </Sheet>
-  )
+  );
 }
