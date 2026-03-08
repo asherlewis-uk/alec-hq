@@ -1,5 +1,8 @@
 # Dual Workspace Catalog Execution Specification
 
+> **Build status tracker**: [`dual-workspace-catalog-execution-spec-build-status.md`](dual-workspace-catalog-execution-spec-build-status.md)
+> Every phase agent MUST update that document upon completing their phase.
+
 ## Objective
 
 Implement a two-workspace architecture in a single Next.js application and a single Supabase project.
@@ -900,7 +903,8 @@ Example mapper pattern:
 
 ```ts
 type CatalogAssetRow = Database["public"]["Tables"]["catalog_assets"]["Row"];
-type WorkspaceAssetLinkRow = Database["public"]["Tables"]["workspace_asset_links"]["Row"];
+type WorkspaceAssetLinkRow =
+  Database["public"]["Tables"]["workspace_asset_links"]["Row"];
 
 export function mapCatalogAssetRow(row: CatalogAssetRow): CatalogAsset {
   return {
@@ -957,17 +961,24 @@ export interface WorkspaceLoginInput {
   pin: string;
 }
 
-export function validateWorkspaceLoginInput(body: unknown): WorkspaceLoginInput {
+export function validateWorkspaceLoginInput(
+  body: unknown,
+): WorkspaceLoginInput {
   if (!body || typeof body !== "object") {
     throw new ValidationError("Invalid request payload");
   }
 
   const input = body as Record<string, unknown>;
-  const workspaceSlug = assertString(input.workspaceSlug, "workspaceSlug").toLowerCase();
+  const workspaceSlug = assertString(
+    input.workspaceSlug,
+    "workspaceSlug",
+  ).toLowerCase();
   const pin = assertString(input.pin, "pin");
 
   if (!/^[a-z0-9-]{3,32}$/.test(workspaceSlug)) {
-    throw new ValidationError("workspaceSlug must be 3-32 characters of lowercase letters, digits, or hyphens");
+    throw new ValidationError(
+      "workspaceSlug must be 3-32 characters of lowercase letters, digits, or hyphens",
+    );
   }
 
   if (!/^\d{6}$/.test(pin)) {
@@ -1001,7 +1012,10 @@ Implementation:
 import { NextRequest, NextResponse } from "next/server";
 import { apiError } from "@/lib/server/api-response";
 import { setWorkspaceSessionCookie } from "@/lib/server/auth/session";
-import { validateWorkspaceLoginInput, ValidationError } from "@/lib/server/validation";
+import {
+  validateWorkspaceLoginInput,
+  ValidationError,
+} from "@/lib/server/validation";
 import { verifyWorkspacePin } from "@/lib/server/auth/workspace-pin";
 
 export const runtime = "nodejs";
@@ -1013,7 +1027,11 @@ export async function POST(request: NextRequest) {
     const workspace = await verifyWorkspacePin(input.workspaceSlug, input.pin);
 
     if (!workspace) {
-      return apiError(401, "INVALID_CREDENTIALS", "Incorrect workspace or PIN.");
+      return apiError(
+        401,
+        "INVALID_CREDENTIALS",
+        "Incorrect workspace or PIN.",
+      );
     }
 
     const response = NextResponse.json({
@@ -1139,7 +1157,10 @@ import { NextRequest } from "next/server";
 import { apiError, apiOk } from "@/lib/server/api-response";
 import { ensureWorkspaceAccess } from "@/lib/server/auth/workspace";
 import { getServiceSupabase } from "@/lib/server/supabase";
-import { mapWorkspaceAssetLinkRow, mapCatalogAssetRow } from "@/lib/server/mappers";
+import {
+  mapWorkspaceAssetLinkRow,
+  mapCatalogAssetRow,
+} from "@/lib/server/mappers";
 
 export const runtime = "nodejs";
 
@@ -1150,21 +1171,30 @@ export async function GET(request: NextRequest) {
   const supabase = getServiceSupabase();
   const { data, error } = await supabase
     .from("workspace_asset_links")
-    .select(`
+    .select(
+      `
       *,
       catalog_assets (*)
-    `)
+    `,
+    )
     .eq("workspace_id", auth.session.workspaceId)
     .order("updated_at", { ascending: false });
 
   if (error) {
-    return apiError(500, "DB_ERROR", "Failed to fetch workspace assets.", error.message);
+    return apiError(
+      500,
+      "DB_ERROR",
+      "Failed to fetch workspace assets.",
+      error.message,
+    );
   }
 
   return apiOk(
     (data ?? []).map((row) => ({
       link: mapWorkspaceAssetLinkRow(row),
-      catalogAsset: row.catalog_assets ? mapCatalogAssetRow(row.catalog_assets) : null,
+      catalogAsset: row.catalog_assets
+        ? mapCatalogAssetRow(row.catalog_assets)
+        : null,
     })),
   );
 }
@@ -1201,7 +1231,11 @@ Target pattern:
 
 ```ts
 const publicPagePrefixes = ["/login", "/catalog", "/share"];
-const publicApiPrefixes = ["/api/auth/workspace/login", "/api/auth/session", "/api/catalog"];
+const publicApiPrefixes = [
+  "/api/auth/workspace/login",
+  "/api/auth/session",
+  "/api/catalog",
+];
 ```
 
 Do not classify old `api/public/assets` as authoritative after the migration. Replace it with catalog routes.
@@ -1260,8 +1294,14 @@ export function useWorkspaceAssets() {
     isLoading: false,
     error: null as string | null,
     fetchAssets: async () => {},
-    createAssetLink: async (_catalogAssetId: string, _input: { localStatus: AssetStatus; notes?: string | null }) => {},
-    updateAssetLink: async (_id: string, _updates: Partial<Pick<WorkspaceAssetLink, "localStatus" | "notes">>) => {},
+    createAssetLink: async (
+      _catalogAssetId: string,
+      _input: { localStatus: AssetStatus; notes?: string | null },
+    ) => {},
+    updateAssetLink: async (
+      _id: string,
+      _updates: Partial<Pick<WorkspaceAssetLink, "localStatus" | "notes">>,
+    ) => {},
     deleteAssetLink: async (_id: string) => {},
   };
 }
@@ -1384,6 +1424,8 @@ Persisted context required across execution boundary:
 - naming conventions
 - decision that public share is catalog-only
 
+> **On completion:** update `docs/dual-workspace-catalog-execution-spec-build-status.md` — Phase 1 section.
+
 ## Phase 2: Schema Introduction
 
 Strict ordering: after Phase 0 and Phase 1, before any runtime wiring.
@@ -1406,6 +1448,8 @@ Validation:
 - `catalog_assets` contains migrated legacy assets
 - no legacy tables dropped
 
+> **On completion:** update `docs/dual-workspace-catalog-execution-spec-build-status.md` — Phase 2 section.
+
 ## Phase 3: Session Rewire
 
 Strict ordering: after Phase 2.
@@ -1424,6 +1468,8 @@ Validation:
 - login to workspace B yields session B
 - invalid PIN rejected
 - `/login` redirects when a valid session exists
+
+> **On completion:** update `docs/dual-workspace-catalog-execution-spec-build-status.md` — Phase 3 section.
 
 ## Phase 4: New Route Families
 
@@ -1446,6 +1492,8 @@ Validation:
 - workspace A cannot read workspace B data even if ids are guessed
 - public catalog routes work unauthenticated
 - workspace routes require a valid session
+
+> **On completion:** update `docs/dual-workspace-catalog-execution-spec-build-status.md` — Phase 4 section.
 
 ## Phase 5: Client And UI Migration
 
@@ -1471,6 +1519,8 @@ Validation:
 - user sees only their own workspace logs and wishlist after sign-in
 - dashboard counts differ correctly between workspace A and workspace B
 
+> **On completion:** update `docs/dual-workspace-catalog-execution-spec-build-status.md` — Phase 5 section.
+
 ## Phase 6: Legacy Decommissioning
 
 Strict ordering: only after all prior phases are verified.
@@ -1481,6 +1531,8 @@ Actions:
 2. Remove passcode-era documentation.
 3. Replace stale smoke tests.
 4. Add a later cleanup migration for legacy private tables only after data disposition is decided.
+
+> **On completion:** update `docs/dual-workspace-catalog-execution-spec-build-status.md` — Phase 6 section.
 
 ## Testing Specification
 
