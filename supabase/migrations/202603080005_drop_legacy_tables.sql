@@ -69,7 +69,7 @@ SELECT
   c.brand,
   c.model,
   c.specs,
-  c.condition,
+  c.condition::component_condition,
   c.installed_date,
   c.notes,
   c.created_at

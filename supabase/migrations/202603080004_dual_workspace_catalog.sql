@@ -298,7 +298,7 @@ insert into public.catalog_assets (
 select
   a.id,
   a.name,
-  a.category,
+  a.category::asset_category,
   a.cover_image,
   a.notes,
   coalesce(a.is_public, true),
