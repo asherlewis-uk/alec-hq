@@ -17,14 +17,29 @@ Dual-workspace command center for tracking garage/rig assets, logs, configuratio
 
 Copy `.env.example` to `.env.local` and populate values.
 
-| Variable                        | Purpose                                      |
-| ------------------------------- | -------------------------------------------- |
-| `NEXT_PUBLIC_APP_URL`           | Canonical app URL (metadata, links)          |
-| `SUPABASE_URL`                  | Supabase project URL (server-side)           |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Supabase service role key (server-side only) |
-| `SESSION_SECRET`                | HMAC secret for session cookie signing       |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Optional compatibility value                 |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Optional compatibility value                 |
+| Variable                    | Purpose                                      |
+| --------------------------- | -------------------------------------------- |
+| `NEXT_PUBLIC_APP_URL`       | Canonical app URL (metadata, links)          |
+| `NEXT_PUBLIC_SUPABASE_URL`  | Supabase project URL used by server routes   |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-side only) |
+| `SESSION_SECRET`            | HMAC secret for session cookie signing       |
+| `SESSION_TTL_HOURS`         | Optional session lifetime override           |
+
+## Optional Environment Variables
+
+| Variable                        | Purpose                      |
+| ------------------------------- | ---------------------------- |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Optional compatibility value |
+
+## Optional Test Environment Variables
+
+| Variable               | Purpose                             |
+| ---------------------- | ----------------------------------- |
+| `E2E_BASE_URL`         | Base URL for Playwright smoke tests |
+| `E2E_WORKSPACE_A_SLUG` | Workspace A slug for smoke tests    |
+| `E2E_WORKSPACE_A_PIN`  | Workspace A PIN for smoke tests     |
+| `E2E_WORKSPACE_B_SLUG` | Workspace B slug for smoke tests    |
+| `E2E_WORKSPACE_B_PIN`  | Workspace B PIN for smoke tests     |
 
 ## Local Development
 
@@ -72,7 +87,7 @@ npm run test:smoke
 2. Ensure build command is `npm run build`.
 3. Deploy.
 4. Post-deploy smoke:
-   - Login works (`/login` — workspace select + PIN)
+   - Login works (`/login` — workspace buttons + 6-digit PIN inputs)
    - Catalog browse works (`/catalog`)
    - Workspace CRUD works (`/workspace/*`, `/garage`, `/rig`)
    - Share route works only for public catalog assets (`/share/[id]`)
