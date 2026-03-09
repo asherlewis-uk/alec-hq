@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   if (!auth.ok) return auth.response;
 
   const supabase = getServiceSupabase();
-  const { data, error } = await supabase
+  const { data: configurationRows, error } = await supabase
     .from("workspace_configurations")
     .select("*")
     .eq("workspace_id", auth.session.workspaceId)
@@ -30,14 +30,14 @@ export async function GET(request: NextRequest) {
   }
 
   return apiOk(
-    (data ?? []).map((row) => ({
-      id: row.id,
-      workspaceId: row.workspace_id,
-      name: row.name,
-      kind: row.kind,
-      notes: row.notes,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
+    (configurationRows ?? []).map((configurationRow) => ({
+      id: configurationRow.id,
+      workspaceId: configurationRow.workspace_id,
+      name: configurationRow.name,
+      kind: configurationRow.kind,
+      notes: configurationRow.notes,
+      createdAt: configurationRow.created_at,
+      updatedAt: configurationRow.updated_at,
     })),
   );
 }
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     const input = validateCreateWorkspaceConfigurationInput(body);
 
     const supabase = getServiceSupabase();
-    const { data, error } = await supabase
+    const { data: createdConfigurationRow, error } = await supabase
       .from("workspace_configurations")
       .insert({
         workspace_id: auth.session.workspaceId,
@@ -73,13 +73,13 @@ export async function POST(request: NextRequest) {
 
     return apiOk(
       {
-        id: data.id,
-        workspaceId: data.workspace_id,
-        name: data.name,
-        kind: data.kind,
-        notes: data.notes,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        id: createdConfigurationRow.id,
+        workspaceId: createdConfigurationRow.workspace_id,
+        name: createdConfigurationRow.name,
+        kind: createdConfigurationRow.kind,
+        notes: createdConfigurationRow.notes,
+        createdAt: createdConfigurationRow.created_at,
+        updatedAt: createdConfigurationRow.updated_at,
       },
       201,
     );

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   if (!auth.ok) return auth.response;
 
   const supabase = getServiceSupabase();
-  const { data, error } = await supabase
+  const { data: workspaceLogRows, error } = await supabase
     .from("workspace_logs")
     .select("*")
     .eq("workspace_id", auth.session.workspaceId)
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  return apiOk((data ?? []).map(mapWorkspaceLogRow));
+  return apiOk((workspaceLogRows ?? []).map(mapWorkspaceLogRow));
 }
 
 export async function POST(request: NextRequest) {
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       performedBy: input.performedBy,
     });
 
-    const { data, error } = await supabase
+    const { data: createdWorkspaceLogRow, error } = await supabase
       .from("workspace_logs")
       .insert(insert)
       .select()
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return apiOk(mapWorkspaceLogRow(data), 201);
+    return apiOk(mapWorkspaceLogRow(createdWorkspaceLogRow), 201);
   } catch (error) {
     if (error instanceof ValidationError) {
       return apiError(400, "VALIDATION_ERROR", error.message);

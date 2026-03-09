@@ -19,24 +19,26 @@ export function useWorkspaceConfigurations() {
   const fetchIdRef = useRef(0);
 
   const fetchConfigurations = useCallback(async () => {
-    const id = ++fetchIdRef.current;
+    const requestId = ++fetchIdRef.current;
     setIsLoading(true);
     try {
-      const data = await apiRequest<WorkspaceConfiguration[]>(
-        "/api/workspace/configurations",
-      );
-      if (fetchIdRef.current === id) {
-        setConfigurations(data || []);
+      const workspaceConfigurations = await apiRequest<
+        WorkspaceConfiguration[]
+      >("/api/workspace/configurations");
+      if (fetchIdRef.current === requestId) {
+        setConfigurations(workspaceConfigurations ?? []);
         setError(null);
       }
-    } catch (err) {
-      if (fetchIdRef.current === id) {
+    } catch (error) {
+      if (fetchIdRef.current === requestId) {
         setError(
-          err instanceof Error ? err.message : "Failed to fetch configurations",
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch configurations",
         );
       }
     } finally {
-      if (fetchIdRef.current === id) {
+      if (fetchIdRef.current === requestId) {
         setIsLoading(false);
       }
     }

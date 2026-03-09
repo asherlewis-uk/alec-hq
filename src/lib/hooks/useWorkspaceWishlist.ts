@@ -21,24 +21,24 @@ export function useWorkspaceWishlist() {
   const fetchIdRef = useRef(0);
 
   const fetchWishlist = useCallback(async () => {
-    const id = ++fetchIdRef.current;
+    const requestId = ++fetchIdRef.current;
     setIsLoading(true);
     try {
-      const data = await apiRequest<WorkspaceWishlistItem[]>(
+      const wishlistItems = await apiRequest<WorkspaceWishlistItem[]>(
         "/api/workspace/wishlist",
       );
-      if (fetchIdRef.current === id) {
-        setWishlist(data || []);
+      if (fetchIdRef.current === requestId) {
+        setWishlist(wishlistItems ?? []);
         setError(null);
       }
-    } catch (err) {
-      if (fetchIdRef.current === id) {
+    } catch (error) {
+      if (fetchIdRef.current === requestId) {
         setError(
-          err instanceof Error ? err.message : "Failed to fetch wishlist",
+          error instanceof Error ? error.message : "Failed to fetch wishlist",
         );
       }
     } finally {
-      if (fetchIdRef.current === id) {
+      if (fetchIdRef.current === requestId) {
         setIsLoading(false);
       }
     }

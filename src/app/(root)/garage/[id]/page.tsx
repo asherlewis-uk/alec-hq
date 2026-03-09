@@ -32,8 +32,10 @@ export default function GarageDetailPage() {
 
   const fetchCatalogAsset = useCallback(async () => {
     try {
-      const data = await apiRequest<CatalogAsset>(`/api/catalog/assets/${id}`);
-      setCatalogAsset(data);
+      const assetResponse = await apiRequest<CatalogAsset>(
+        `/api/catalog/assets/${id}`,
+      );
+      setCatalogAsset(assetResponse);
     } catch {
       router.push("/garage");
     } finally {

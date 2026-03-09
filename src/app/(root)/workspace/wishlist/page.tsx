@@ -53,33 +53,39 @@ export default function WorkspaceWishlistPage() {
 
       {!isLoading && !error && wishlist.length > 0 && (
         <div className="space-y-3">
-          {wishlist.map((item) => (
+          {wishlist.map((wishlistItem) => (
             <motion.div
-              key={item.id}
+              key={wishlistItem.id}
               whileHover={{ x: 4 }}
               className="glass rounded-glass p-4"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-white font-medium">{item.name}</h3>
-                  {item.brand && (
-                    <p className="text-sm text-text-secondary">{item.brand}</p>
+                  <h3 className="text-white font-medium">
+                    {wishlistItem.name}
+                  </h3>
+                  {wishlistItem.brand && (
+                    <p className="text-sm text-text-secondary">
+                      {wishlistItem.brand}
+                    </p>
                   )}
-                  {item.notes && (
-                    <p className="text-sm text-text-muted mt-1">{item.notes}</p>
+                  {wishlistItem.notes && (
+                    <p className="text-sm text-text-muted mt-1">
+                      {wishlistItem.notes}
+                    </p>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  {item.estimatedPrice != null && (
+                  {wishlistItem.estimatedPrice != null && (
                     <span className="text-sm text-text-secondary">
-                      {formatCurrency(item.estimatedPrice)}
+                      {formatCurrency(wishlistItem.estimatedPrice)}
                     </span>
                   )}
                   <Badge
                     variant="outline"
-                    className={`text-xs ${PRIORITY_COLORS[item.priority] ?? ""}`}
+                    className={`text-xs ${PRIORITY_COLORS[wishlistItem.priority] ?? ""}`}
                   >
-                    {item.priority}
+                    {wishlistItem.priority}
                   </Badge>
                 </div>
               </div>

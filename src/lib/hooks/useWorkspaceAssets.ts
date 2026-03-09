@@ -20,26 +20,26 @@ export function useWorkspaceAssets() {
   const fetchIdRef = useRef(0);
 
   const fetchAssets = useCallback(async () => {
-    const id = ++fetchIdRef.current;
+    const requestId = ++fetchIdRef.current;
     setIsLoading(true);
     try {
-      const data = await apiRequest<WorkspaceAssetView[]>(
+      const workspaceAssets = await apiRequest<WorkspaceAssetView[]>(
         "/api/workspace/assets",
       );
-      if (fetchIdRef.current === id) {
-        setAssets(data || []);
+      if (fetchIdRef.current === requestId) {
+        setAssets(workspaceAssets ?? []);
         setError(null);
       }
-    } catch (err) {
-      if (fetchIdRef.current === id) {
+    } catch (error) {
+      if (fetchIdRef.current === requestId) {
         setError(
-          err instanceof Error
-            ? err.message
+          error instanceof Error
+            ? error.message
             : "Failed to fetch workspace assets",
         );
       }
     } finally {
-      if (fetchIdRef.current === id) {
+      if (fetchIdRef.current === requestId) {
         setIsLoading(false);
       }
     }
@@ -70,7 +70,11 @@ export function useWorkspaceAssets() {
         `/api/workspace/assets/${id}`,
         { method: "PATCH", body: updates },
       );
-      setAssets((prev) => prev.map((a) => (a.link.id === id ? updated : a)));
+      setAssets((prev) =>
+        prev.map((assetView) =>
+          assetView.link.id === id ? updated : assetView,
+        ),
+      );
       return updated;
     },
     [],
@@ -80,7 +84,7 @@ export function useWorkspaceAssets() {
     await apiRequest<void>(`/api/workspace/assets/${id}`, {
       method: "DELETE",
     });
-    setAssets((prev) => prev.filter((a) => a.link.id !== id));
+    setAssets((prev) => prev.filter((assetView) => assetView.link.id !== id));
   }, []);
 
   return {

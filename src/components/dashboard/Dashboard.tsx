@@ -87,28 +87,28 @@ export function Dashboard() {
             Linked Assets
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {assets.slice(0, 6).map((item) => (
+            {assets.slice(0, 6).map((assetView) => (
               <motion.div
-                key={item.link.id}
+                key={assetView.link.id}
                 whileHover={{ y: -4 }}
                 className="glass rounded-glass p-4"
               >
                 <div className="flex items-start justify-between mb-2">
                   <h4 className="text-white font-medium">
-                    {item.catalogAsset?.name ?? "Unknown Asset"}
+                    {assetView.catalogAsset?.name ?? "Unnamed asset"}
                   </h4>
                   <span className="text-xs text-text-secondary bg-white/10 px-2 py-0.5 rounded">
-                    {item.link.localStatus}
+                    {assetView.link.localStatus}
                   </span>
                 </div>
-                {item.catalogAsset?.category && (
+                {assetView.catalogAsset?.category && (
                   <p className="text-xs text-text-secondary">
-                    {item.catalogAsset.category}
+                    {assetView.catalogAsset.category}
                   </p>
                 )}
-                {item.link.notes && (
+                {assetView.link.notes && (
                   <p className="text-sm text-text-muted mt-2 line-clamp-2">
-                    {item.link.notes}
+                    {assetView.link.notes}
                   </p>
                 )}
               </motion.div>

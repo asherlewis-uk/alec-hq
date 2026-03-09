@@ -12,30 +12,30 @@ export function useCatalogAssets() {
 
   const fetchAssets = useCallback(
     async (opts?: { category?: AssetCategory; search?: string }) => {
-      const id = ++fetchIdRef.current;
+      const requestId = ++fetchIdRef.current;
       setIsLoading(true);
       try {
         const params = new URLSearchParams();
         if (opts?.category) params.set("category", opts.category);
         if (opts?.search) params.set("search", opts.search);
         const qs = params.toString();
-        const data = await apiRequest<CatalogAsset[]>(
+        const catalogAssets = await apiRequest<CatalogAsset[]>(
           `/api/catalog/assets${qs ? `?${qs}` : ""}`,
         );
-        if (fetchIdRef.current === id) {
-          setAssets(data || []);
+        if (fetchIdRef.current === requestId) {
+          setAssets(catalogAssets ?? []);
           setError(null);
         }
-      } catch (err) {
-        if (fetchIdRef.current === id) {
+      } catch (error) {
+        if (fetchIdRef.current === requestId) {
           setError(
-            err instanceof Error
-              ? err.message
+            error instanceof Error
+              ? error.message
               : "Failed to fetch catalog assets",
           );
         }
       } finally {
-        if (fetchIdRef.current === id) {
+        if (fetchIdRef.current === requestId) {
           setIsLoading(false);
         }
       }

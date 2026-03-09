@@ -29,7 +29,7 @@ export async function GET(
   const supabase = getServiceSupabase();
 
   // Verify configuration belongs to this workspace
-  const { data: config, error: configError } = await supabase
+  const { data: configurationRecord, error: configError } = await supabase
     .from("workspace_configurations")
     .select("id")
     .eq("id", id)
@@ -45,11 +45,11 @@ export async function GET(
     );
   }
 
-  if (!config) {
+  if (!configurationRecord) {
     return apiError(404, "NOT_FOUND", "Configuration not found.");
   }
 
-  const { data, error } = await supabase
+  const { data: slotRows, error } = await supabase
     .from("configuration_slots")
     .select("*")
     .eq("configuration_id", id)
@@ -61,14 +61,14 @@ export async function GET(
   }
 
   return apiOk(
-    (data ?? []).map((row) => ({
-      id: row.id,
-      workspaceId: row.workspace_id,
-      configurationId: row.configuration_id,
-      slotKey: row.slot_key,
-      label: row.label,
-      sortOrder: row.sort_order,
-      createdAt: row.created_at,
+    (slotRows ?? []).map((slotRow) => ({
+      id: slotRow.id,
+      workspaceId: slotRow.workspace_id,
+      configurationId: slotRow.configuration_id,
+      slotKey: slotRow.slot_key,
+      label: slotRow.label,
+      sortOrder: slotRow.sort_order,
+      createdAt: slotRow.created_at,
     })),
   );
 }
@@ -96,7 +96,7 @@ export async function POST(
     const supabase = getServiceSupabase();
 
     // Verify configuration belongs to this workspace
-    const { data: config, error: configError } = await supabase
+    const { data: configurationRecord, error: configError } = await supabase
       .from("workspace_configurations")
       .select("id")
       .eq("id", id)
@@ -112,11 +112,11 @@ export async function POST(
       );
     }
 
-    if (!config) {
+    if (!configurationRecord) {
       return apiError(404, "NOT_FOUND", "Configuration not found.");
     }
 
-    const { data, error } = await supabase
+    const { data: createdSlotRow, error } = await supabase
       .from("configuration_slots")
       .insert({
         configuration_id: id,
@@ -141,13 +141,13 @@ export async function POST(
 
     return apiOk(
       {
-        id: data.id,
-        workspaceId: data.workspace_id,
-        configurationId: data.configuration_id,
-        slotKey: data.slot_key,
-        label: data.label,
-        sortOrder: data.sort_order,
-        createdAt: data.created_at,
+        id: createdSlotRow.id,
+        workspaceId: createdSlotRow.workspace_id,
+        configurationId: createdSlotRow.configuration_id,
+        slotKey: createdSlotRow.slot_key,
+        label: createdSlotRow.label,
+        sortOrder: createdSlotRow.sort_order,
+        createdAt: createdSlotRow.created_at,
       },
       201,
     );

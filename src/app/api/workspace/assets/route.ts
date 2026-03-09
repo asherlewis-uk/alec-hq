@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   if (!auth.ok) return auth.response;
 
   const supabase = getServiceSupabase();
-  const { data, error } = await supabase
+  const { data: assetLinkRows, error } = await supabase
     .from("workspace_asset_links")
     .select(
       `
@@ -40,10 +40,10 @@ export async function GET(request: NextRequest) {
   }
 
   return apiOk(
-    (data ?? []).map((row) => ({
-      link: mapWorkspaceAssetLinkRow(row),
-      catalogAsset: row.catalog_assets
-        ? mapCatalogAssetRow(row.catalog_assets)
+    (assetLinkRows ?? []).map((assetLinkRow) => ({
+      link: mapWorkspaceAssetLinkRow(assetLinkRow),
+      catalogAsset: assetLinkRow.catalog_assets
+        ? mapCatalogAssetRow(assetLinkRow.catalog_assets)
         : null,
     })),
   );
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       notes: input.notes,
     });
 
-    const { data, error } = await supabase
+    const { data: createdAssetLinkRow, error } = await supabase
       .from("workspace_asset_links")
       .insert(insert)
       .select()
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return apiOk(mapWorkspaceAssetLinkRow(data), 201);
+    return apiOk(mapWorkspaceAssetLinkRow(createdAssetLinkRow), 201);
   } catch (error) {
     if (error instanceof ValidationError) {
       return apiError(400, "VALIDATION_ERROR", error.message);

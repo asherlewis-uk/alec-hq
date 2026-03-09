@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   if (!auth.ok) return auth.response;
 
   const supabase = getServiceSupabase();
-  const { data, error } = await supabase
+  const { data: wishlistRows, error } = await supabase
     .from("workspace_wishlist_items")
     .select("*")
     .eq("workspace_id", auth.session.workspaceId)
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  return apiOk((data ?? []).map(mapWorkspaceWishlistRow));
+  return apiOk((wishlistRows ?? []).map(mapWorkspaceWishlistRow));
 }
 
 export async function POST(request: NextRequest) {
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       notes: input.notes,
     });
 
-    const { data, error } = await supabase
+    const { data: createdWishlistRow, error } = await supabase
       .from("workspace_wishlist_items")
       .insert(insert)
       .select()
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return apiOk(mapWorkspaceWishlistRow(data), 201);
+    return apiOk(mapWorkspaceWishlistRow(createdWishlistRow), 201);
   } catch (error) {
     if (error instanceof ValidationError) {
       return apiError(400, "VALIDATION_ERROR", error.message);

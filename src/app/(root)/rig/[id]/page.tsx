@@ -9,16 +9,16 @@ import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/api/client";
 import Link from "next/link";
 
-function catalogToAsset(ca: CatalogAsset): Asset {
+function catalogToAsset(catalogAsset: CatalogAsset): Asset {
   return {
-    id: ca.id,
-    name: ca.name,
-    category: ca.category,
+    id: catalogAsset.id,
+    name: catalogAsset.name,
+    category: catalogAsset.category,
     status: "ACTIVE",
-    coverImage: ca.coverImage ?? null,
-    isPublic: ca.isPublic,
-    createdAt: ca.createdAt,
-    updatedAt: ca.updatedAt,
+    coverImage: catalogAsset.coverImage ?? null,
+    isPublic: catalogAsset.isPublic,
+    createdAt: catalogAsset.createdAt,
+    updatedAt: catalogAsset.updatedAt,
   };
 }
 
@@ -32,8 +32,10 @@ export default function RigDetailPage() {
 
   const fetchCatalogAsset = useCallback(async () => {
     try {
-      const data = await apiRequest<CatalogAsset>(`/api/catalog/assets/${id}`);
-      setCatalogAsset(data);
+      const assetResponse = await apiRequest<CatalogAsset>(
+        `/api/catalog/assets/${id}`,
+      );
+      setCatalogAsset(assetResponse);
     } catch {
       router.push("/rig");
     } finally {

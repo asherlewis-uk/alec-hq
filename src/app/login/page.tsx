@@ -114,9 +114,9 @@ function LoginContent() {
       );
       router.replace(nextPath);
       router.refresh();
-    } catch (err) {
+    } catch (error) {
       setError(
-        err instanceof Error ? err.message : "Incorrect workspace or PIN.",
+        error instanceof Error ? error.message : "Incorrect workspace or PIN.",
       );
     } finally {
       setIsSubmitting(false);

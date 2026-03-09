@@ -9,14 +9,14 @@ import { useEffect, useMemo } from "react";
 import type { Asset } from "@/lib/types";
 
 function toAsset(view: WorkspaceAssetView): Asset {
-  const ca = view.catalogAsset;
+  const catalogAsset = view.catalogAsset;
   return {
-    id: ca?.id ?? view.link.catalogAssetId,
-    name: ca?.name ?? "Unknown",
-    category: ca?.category ?? "VEHICLE",
+    id: catalogAsset?.id ?? view.link.catalogAssetId,
+    name: catalogAsset?.name ?? "Unnamed asset",
+    category: catalogAsset?.category ?? "VEHICLE",
     status: view.link.localStatus,
-    coverImage: ca?.coverImage ?? null,
-    isPublic: ca?.isPublic ?? false,
+    coverImage: catalogAsset?.coverImage ?? null,
+    isPublic: catalogAsset?.isPublic ?? false,
     createdAt: view.link.createdAt,
     updatedAt: view.link.updatedAt,
   };
@@ -31,7 +31,9 @@ export default function GaragePage() {
 
   const filteredAssets = useMemo(
     () =>
-      assets.filter((a) => a.catalogAsset?.category === "VEHICLE").map(toAsset),
+      assets
+        .filter((assetView) => assetView.catalogAsset?.category === "VEHICLE")
+        .map(toAsset),
     [assets],
   );
 

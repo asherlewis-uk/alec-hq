@@ -1,5 +1,8 @@
 import type { ApiErrorPayload } from "@/lib/types";
 
+const DEFAULT_REQUEST_TIMEOUT_MS = 15_000;
+const UNKNOWN_API_ERROR_CODE = "UNKNOWN_ERROR";
+
 export class ApiClientError extends Error {
   status: number;
   code: string;
@@ -29,7 +32,7 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const defaultSignal =
     typeof AbortSignal !== "undefined" && AbortSignal.timeout
-      ? AbortSignal.timeout(15000)
+      ? AbortSignal.timeout(DEFAULT_REQUEST_TIMEOUT_MS)
       : undefined;
 
   const headers = {
@@ -42,7 +45,7 @@ export async function apiRequest<T>(
     headers,
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
     cache: "no-store",
-    signal: options.signal || defaultSignal,
+    signal: options.signal ?? defaultSignal,
   });
 
   if (!response.ok) {
@@ -54,7 +57,7 @@ export async function apiRequest<T>(
     }
     throw new ApiClientError(
       response.status,
-      payload?.error?.code ?? "UNKNOWN_ERROR",
+      payload?.error?.code ?? UNKNOWN_API_ERROR_CODE,
       payload?.error?.message ??
         `Request failed with status ${response.status}`,
       payload?.error?.details,

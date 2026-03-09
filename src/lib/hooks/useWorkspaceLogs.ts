@@ -23,20 +23,24 @@ export function useWorkspaceLogs() {
   const fetchIdRef = useRef(0);
 
   const fetchLogs = useCallback(async () => {
-    const id = ++fetchIdRef.current;
+    const requestId = ++fetchIdRef.current;
     setIsLoading(true);
     try {
-      const data = await apiRequest<WorkspaceLog[]>("/api/workspace/logs");
-      if (fetchIdRef.current === id) {
-        setLogs(data || []);
+      const workspaceLogs = await apiRequest<WorkspaceLog[]>(
+        "/api/workspace/logs",
+      );
+      if (fetchIdRef.current === requestId) {
+        setLogs(workspaceLogs ?? []);
         setError(null);
       }
-    } catch (err) {
-      if (fetchIdRef.current === id) {
-        setError(err instanceof Error ? err.message : "Failed to fetch logs");
+    } catch (error) {
+      if (fetchIdRef.current === requestId) {
+        setError(
+          error instanceof Error ? error.message : "Failed to fetch logs",
+        );
       }
     } finally {
-      if (fetchIdRef.current === id) {
+      if (fetchIdRef.current === requestId) {
         setIsLoading(false);
       }
     }

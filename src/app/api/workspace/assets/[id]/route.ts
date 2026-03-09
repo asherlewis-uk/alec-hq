@@ -35,7 +35,7 @@ export async function PATCH(
       updates.local_status = input.localStatus;
     if (input.notes !== undefined) updates.notes = input.notes;
 
-    const { data, error } = await supabase
+    const { data: updatedAssetLinkRow, error } = await supabase
       .from("workspace_asset_links")
       .update(updates)
       .eq("id", id)
@@ -52,11 +52,11 @@ export async function PATCH(
       );
     }
 
-    if (!data) {
+    if (!updatedAssetLinkRow) {
       return apiError(404, "NOT_FOUND", "Workspace asset link not found.");
     }
 
-    return apiOk(mapWorkspaceAssetLinkRow(data));
+    return apiOk(mapWorkspaceAssetLinkRow(updatedAssetLinkRow));
   } catch (error) {
     if (error instanceof ValidationError) {
       return apiError(400, "VALIDATION_ERROR", error.message);
