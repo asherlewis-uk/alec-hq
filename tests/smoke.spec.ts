@@ -28,9 +28,11 @@ async function loginWorkspace(
   pin: string,
 ) {
   await page.goto("/login");
-  await page.getByRole("button", {
-    name: new RegExp(workspaceLabels[slug] ?? slug, "i"),
-  }).click();
+  await page
+    .getByRole("button", {
+      name: new RegExp(workspaceLabels[slug] ?? slug, "i"),
+    })
+    .click();
 
   for (const [index, digit] of Array.from(pin).entries()) {
     await page
@@ -106,7 +108,9 @@ test.describe("Multi-workspace smoke tests", () => {
       page.getByRole("main").getByRole("heading", { name: "Configurations" }),
     ).toBeVisible();
     await expect(page.getByText(alecPrivateState.configuration)).toBeVisible();
-    await expect(page.getByText(asherPrivateState.configuration)).toHaveCount(0);
+    await expect(page.getByText(asherPrivateState.configuration)).toHaveCount(
+      0,
+    );
 
     await page.goto("/workspace/logs");
     await expect(
