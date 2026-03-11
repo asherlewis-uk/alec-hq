@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { apiError, apiOk } from "@/lib/server/api-response";
+import { requireWorkspaceFromRequest } from "@/lib/server/auth/session";
 import { getServiceSupabase } from "@/lib/server/supabase";
 import { mapCatalogAssetRow } from "@/lib/server/mappers";
 import type { AssetCategory } from "@/lib/types";
@@ -9,6 +10,7 @@ export const runtime = "nodejs";
 export async function GET(request: NextRequest) {
   const supabase = getServiceSupabase();
   const { searchParams } = request.nextUrl;
+  const session = await requireWorkspaceFromRequest(request);
 
   let query = supabase.from("catalog_assets").select("*");
 
@@ -23,7 +25,7 @@ export async function GET(request: NextRequest) {
   }
 
   const publicOnly = searchParams.get("publicOnly");
-  if (publicOnly === "true") {
+  if (publicOnly === "true" || !session) {
     query = query.eq("is_public", true);
   }
 
