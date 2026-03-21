@@ -26,10 +26,10 @@ function CatalogCard({ asset }: { asset: CatalogAsset }) {
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <p className="text-xs text-text-secondary">
+          <p className="text-xs text-secondary">
             {getCategoryLabel(asset.category)}
           </p>
-          <h3 className="text-lg font-bold text-white mt-1 line-clamp-2">
+          <h3 className="text-lg font-bold text-primary mt-1 line-clamp-2">
             {asset.name}
           </h3>
         </div>
@@ -37,14 +37,14 @@ function CatalogCard({ asset }: { asset: CatalogAsset }) {
       </div>
 
       {asset.manufacturer && (
-        <p className="text-sm text-text-secondary">
+        <p className="text-sm text-secondary">
           {asset.manufacturer}
           {asset.model ? ` ${asset.model}` : ""}
         </p>
       )}
 
       {asset.summary && (
-        <p className="text-sm text-text-secondary mt-2 line-clamp-2">
+        <p className="text-sm text-secondary mt-2 line-clamp-2">
           {asset.summary}
         </p>
       )}
@@ -58,7 +58,7 @@ function CatalogCard({ asset }: { asset: CatalogAsset }) {
         </Badge>
       </div>
 
-      <p className="text-xs text-text-muted mt-3">
+      <p className="text-xs text-muted mt-3">
         Updated {new Date(asset.updatedAt).toLocaleDateString()}
       </p>
     </motion.div>
@@ -86,21 +86,20 @@ export default function CatalogPage() {
       className="space-y-6"
     >
       <div>
-        <h2 className="text-2xl font-bold text-white">Catalog</h2>
-        <p className="text-text-secondary mt-1">
+        <h2 className="text-2xl font-bold text-primary">Catalog</h2>
+        <p className="text-secondary mt-1">
           Browse the shared asset library
         </p>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary" />
           <Input
             placeholder="Search assets..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white/5 border-white/20 text-white placeholder:text-text-muted"
+            className="pl-10 bg-white/5 border-white/20 text-primary placeholder:text-muted"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -111,8 +110,8 @@ export default function CatalogPage() {
               onClick={() => setSelectedCategory(cat.value)}
               className={`px-3 py-1.5 rounded-glass text-sm transition-all duration-200 ${
                 selectedCategory === cat.value
-                  ? "bg-accent text-black font-medium"
-                  : "glass text-text-secondary hover:text-white"
+                  ? "bg-accent text-primary font-medium"
+                  : "glass text-secondary hover:text-primary"
               }`}
             >
               {cat.label}
@@ -121,7 +120,6 @@ export default function CatalogPage() {
         </div>
       </div>
 
-      {/* Loading */}
       {isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -130,14 +128,12 @@ export default function CatalogPage() {
         </div>
       )}
 
-      {/* Error */}
       {error && (
         <div className="glass rounded-glass p-4 border border-red-400/30">
           <p className="text-red-300 text-sm">{error}</p>
         </div>
       )}
 
-      {/* Grid */}
       {!isLoading && !error && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {assets.map((asset) => (
@@ -146,10 +142,9 @@ export default function CatalogPage() {
         </div>
       )}
 
-      {/* Empty */}
       {!isLoading && !error && assets.length === 0 && (
         <div className="glass rounded-glass p-12 text-center">
-          <p className="text-text-secondary text-lg">
+          <p className="text-secondary text-lg">
             No catalog assets found.
           </p>
         </div>

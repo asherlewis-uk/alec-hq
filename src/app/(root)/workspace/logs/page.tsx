@@ -16,7 +16,7 @@ const TYPE_COLORS: Record<string, string> = {
   UPGRADE: "border-green-400/30 text-green-300",
   REPAIR: "border-red-400/30 text-red-300",
   INSPECTION: "border-yellow-400/30 text-yellow-300",
-  NOTE: "border-white/20 text-text-secondary",
+  NOTE: "border-white/20 text-secondary",
 };
 
 export default function WorkspaceLogsPage() {
@@ -33,8 +33,8 @@ export default function WorkspaceLogsPage() {
       className="space-y-6"
     >
       <div>
-        <h2 className="text-2xl font-bold text-white">Logs</h2>
-        <p className="text-text-secondary mt-1">
+        <h2 className="text-2xl font-bold text-primary">Logs</h2>
+        <p className="text-secondary mt-1">
           Maintenance, upgrades, and notes
         </p>
       </div>
@@ -55,7 +55,7 @@ export default function WorkspaceLogsPage() {
 
       {!isLoading && !error && logs.length === 0 && (
         <div className="glass rounded-glass p-12 text-center">
-          <p className="text-text-secondary text-lg">No logs yet.</p>
+          <p className="text-secondary text-lg">No logs yet.</p>
         </div>
       )}
 
@@ -70,7 +70,7 @@ export default function WorkspaceLogsPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-white font-medium">{log.title}</h3>
+                    <h3 className="text-primary font-medium">{log.title}</h3>
                     <Badge
                       variant="outline"
                       className={`text-xs ${TYPE_COLORS[log.type] ?? ""}`}
@@ -79,11 +79,11 @@ export default function WorkspaceLogsPage() {
                     </Badge>
                   </div>
                   {log.description && (
-                    <p className="text-sm text-text-secondary mt-1">
+                    <p className="text-sm text-secondary mt-1">
                       {log.description}
                     </p>
                   )}
-                  <div className="flex items-center gap-4 mt-2 text-xs text-text-muted">
+                  <div className="flex items-center gap-4 mt-2 text-xs text-muted">
                     <span>{formatDate(log.date)}</span>
                     {log.mileage != null && (
                       <span>{formatMileage(log.mileage)}</span>

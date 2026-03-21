@@ -12,7 +12,7 @@ interface RecentAssetStripProps {
 export function RecentAssetStrip({ assets }: RecentAssetStripProps) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-      <h3 className="text-lg font-semibold text-white mb-4">Recently Updated</h3>
+      <h3 className="text-lg font-semibold text-primary mb-4">Recently Updated</h3>
       <ScrollArea className="w-full rounded-glass">
         <div className="flex gap-4 p-4">
           {assets.map((asset) => (

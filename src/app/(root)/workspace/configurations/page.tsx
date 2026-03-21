@@ -21,8 +21,8 @@ export default function WorkspaceConfigurationsPage() {
       className="space-y-6"
     >
       <div>
-        <h2 className="text-2xl font-bold text-white">Configurations</h2>
-        <p className="text-text-secondary mt-1">
+        <h2 className="text-2xl font-bold text-primary">Configurations</h2>
+        <p className="text-secondary mt-1">
           Your rigs, setups, and arrangements
         </p>
       </div>
@@ -43,7 +43,7 @@ export default function WorkspaceConfigurationsPage() {
 
       {!isLoading && !error && configurations.length === 0 && (
         <div className="glass rounded-glass p-12 text-center">
-          <p className="text-text-secondary text-lg">No configurations yet.</p>
+          <p className="text-secondary text-lg">No configurations yet.</p>
         </div>
       )}
 
@@ -56,7 +56,7 @@ export default function WorkspaceConfigurationsPage() {
               className="glass rounded-glass p-5"
             >
               <div className="flex items-start justify-between mb-2">
-                <h3 className="text-white font-medium text-lg">
+                <h3 className="text-primary font-medium text-lg">
                   {config.name}
                 </h3>
                 <Badge
@@ -67,9 +67,9 @@ export default function WorkspaceConfigurationsPage() {
                 </Badge>
               </div>
               {config.notes && (
-                <p className="text-sm text-text-secondary">{config.notes}</p>
+                <p className="text-sm text-secondary">{config.notes}</p>
               )}
-              <p className="text-xs text-text-muted mt-3">
+              <p className="text-xs text-muted mt-3">
                 Updated {new Date(config.updatedAt).toLocaleDateString()}
               </p>
             </motion.div>

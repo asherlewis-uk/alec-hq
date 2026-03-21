@@ -27,8 +27,8 @@ export default function WorkspaceWishlistPage() {
       className="space-y-6"
     >
       <div>
-        <h2 className="text-2xl font-bold text-white">Wishlist</h2>
-        <p className="text-text-secondary mt-1">Items you want to acquire</p>
+        <h2 className="text-2xl font-bold text-primary">Wishlist</h2>
+        <p className="text-secondary mt-1">Items you want to acquire</p>
       </div>
 
       {isLoading && (
@@ -47,7 +47,7 @@ export default function WorkspaceWishlistPage() {
 
       {!isLoading && !error && wishlist.length === 0 && (
         <div className="glass rounded-glass p-12 text-center">
-          <p className="text-text-secondary text-lg">Your wishlist is empty.</p>
+          <p className="text-secondary text-lg">Your wishlist is empty.</p>
         </div>
       )}
 
@@ -61,23 +61,23 @@ export default function WorkspaceWishlistPage() {
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-white font-medium">
+                  <h3 className="text-primary font-medium">
                     {wishlistItem.name}
                   </h3>
                   {wishlistItem.brand && (
-                    <p className="text-sm text-text-secondary">
+                    <p className="text-sm text-secondary">
                       {wishlistItem.brand}
                     </p>
                   )}
                   {wishlistItem.notes && (
-                    <p className="text-sm text-text-muted mt-1">
+                    <p className="text-sm text-muted mt-1">
                       {wishlistItem.notes}
                     </p>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
                   {wishlistItem.estimatedPrice != null && (
-                    <span className="text-sm text-text-secondary">
+                    <span className="text-sm text-secondary">
                       {formatCurrency(wishlistItem.estimatedPrice)}
                     </span>
                   )}

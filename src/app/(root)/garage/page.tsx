@@ -39,7 +39,7 @@ export default function GaragePage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-white">🏍️ The Garage</h1>
+      <h1 className="text-3xl font-bold text-primary">🏍️ The Garage</h1>
       {error && <p className="text-red-300 text-sm">{error}</p>}
       <AssetGrid assets={filteredAssets} isLoading={isLoading} />
     </div>

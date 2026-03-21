@@ -44,13 +44,13 @@ export function DesignSystemOverlay() {
   }
 
   return (
-    <aside className="fixed bottom-4 right-4 z-[140] w-full max-w-sm glass rounded-glass border border-white/15 p-4 text-white shadow-2xl">
+    <aside className="fixed bottom-4 right-4 z-[140] w-full max-w-sm glass rounded-glass border border-white/15 p-4 text-primary shadow-2xl">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
             Design Monitor
           </p>
-          <p className="mt-1 text-sm text-text-secondary">
+          <p className="mt-1 text-sm text-secondary">
             {hasViolations
               ? `${snapshot.violations.length} violation type(s) detected`
               : "No active design-token violations"}
@@ -66,7 +66,7 @@ export function DesignSystemOverlay() {
         </button>
       </div>
 
-      <div className="mt-3 flex items-center justify-between text-[11px] text-text-muted">
+      <div className="mt-3 flex items-center justify-between text-[11px] text-muted">
         <span>Last scan: {formatLastScan(snapshot.lastScanAt)}</span>
         <span>{approvedMarkers.length} tracked components</span>
       </div>
@@ -78,7 +78,7 @@ export function DesignSystemOverlay() {
               Violations
             </h2>
             {snapshot.violations.length === 0 ? (
-              <p className="mt-2 text-sm text-text-secondary">
+              <p className="mt-2 text-sm text-secondary">
                 Clean pass. No prohibited classes or inline styles were found.
               </p>
             ) : (
@@ -90,20 +90,20 @@ export function DesignSystemOverlay() {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-sm font-medium text-white">
+                        <p className="text-sm font-medium text-primary">
                           {violation.token}
                         </p>
-                        <p className="mt-1 text-xs text-text-secondary">
+                        <p className="mt-1 text-xs text-secondary">
                           {violation.kind === "inline-style"
                             ? `Inline style found in ${violation.element}`
                             : `Found in ${violation.element}`}
                         </p>
                       </div>
-                      <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-text-secondary">
+                      <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-secondary">
                         {violation.count}×
                       </span>
                     </div>
-                    <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-[11px] text-text-muted">
+                    <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-[11px] text-muted">
                       {violation.example}
                     </pre>
                   </div>
@@ -118,7 +118,7 @@ export function DesignSystemOverlay() {
             </h2>
             <div className="mt-3 space-y-2">
               {snapshot.componentUsage.length === 0 ? (
-                <p className="text-sm text-text-secondary">
+                <p className="text-sm text-secondary">
                   No tracked UI components are mounted yet.
                 </p>
               ) : (
@@ -127,8 +127,8 @@ export function DesignSystemOverlay() {
                     key={usage.component}
                     className="flex items-center justify-between rounded-glass border border-white/10 bg-white/5 px-3 py-2"
                   >
-                    <span className="text-sm text-white">{usage.component}</span>
-                    <span className="text-xs text-text-secondary">
+                    <span className="text-sm text-primary">{usage.component}</span>
+                    <span className="text-xs text-secondary">
                       {usage.count}
                     </span>
                   </div>
