@@ -9,6 +9,8 @@ const metadataBase =
     ? new URL(process.env.NEXT_PUBLIC_APP_URL)
     : undefined;
 
+const shouldRenderDesignOverlay = process.env.NODE_ENV !== "production";
+
 export const metadata: Metadata = {
   metadataBase,
   title: "ALEC.HQ",
@@ -44,7 +46,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <PwaInstallGate>{children}</PwaInstallGate>
-        <DesignSystemOverlay />
+        {shouldRenderDesignOverlay ? <DesignSystemOverlay /> : null}
       </body>
     </html>
   );
