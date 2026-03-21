@@ -2,10 +2,13 @@
   "name": "ALEC.HQ",
   "short_name": "ALEC.HQ",
   "description": "Personal Command Center — Your Garage, Your Rig, Your Tech Stack",
+  "id": "/",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0d0d1a",
   "theme_color": "#ff6b00",
+  "prefer_related_applications": false,
   "scope": "/",
   "icons": [
     {
