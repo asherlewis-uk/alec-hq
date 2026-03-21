@@ -10,6 +10,7 @@ import {
   Smartphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { designMarker } from "@/lib/design/classes";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -140,7 +141,7 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
     platform === "android" && installPromptEvent !== null;
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto bg-[radial-gradient(circle_at_top,_rgba(255,107,0,0.28),_transparent_38%),linear-gradient(135deg,_#090913_0%,_#1a0a00_100%)]">
+    <div {...designMarker("PwaInstallGate")} className="fixed inset-0 z-[100] overflow-y-auto bg-[radial-gradient(circle_at_top,_rgba(255,107,0,0.28),_transparent_38%),linear-gradient(135deg,_#090913_0%,_#1a0a00_100%)]">
       <div className="mx-auto flex min-h-screen w-full max-w-xl items-center px-4 py-8">
         <section className="glass w-full rounded-[28px] border border-white/15 p-6 shadow-2xl sm:p-8">
           <div className="flex items-start justify-between gap-4">

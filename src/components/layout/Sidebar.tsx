@@ -12,6 +12,7 @@ import {
   Star,
   ClipboardList,
 } from "lucide-react";
+import { designMarker } from "@/lib/design/classes";
 import { cn } from "@/lib/utils/cn";
 import { useAppStore } from "@/lib/store/useAppStore";
 
@@ -34,7 +35,7 @@ export function Sidebar() {
   const workspace = useAppStore((s) => s.currentWorkspace);
 
   return (
-    <div className="flex flex-col h-full p-6 bg-black/20">
+    <div {...designMarker("Sidebar")} className="flex flex-col h-full p-6 bg-black/20">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}

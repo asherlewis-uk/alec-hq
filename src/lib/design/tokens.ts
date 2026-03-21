@@ -13,22 +13,28 @@ export const designTokens = {
     appBackgroundStyle: "linear-gradient(135deg, #0d0d1a 0%, #1a0a00 100%)",
   },
   radii: {
-    glass: "20px",
-    glassLg: "28px",
+    glass: "rounded-glass",
+    glassLg: "rounded-glass-lg",
+    pill: "rounded-full",
+  },
+  textTones: {
+    primary: "text-primary",
+    secondary: "text-secondary",
+    muted: "text-muted",
+    accent: "text-accent",
+  },
+  surfaceVariants: {
+    default: "glass",
+    accent: "glass glass-accent",
+    success: "glass glass-success",
+    warning: "glass glass-warning",
+    danger: "glass glass-danger",
   },
   utilities: {
-    surface: "glass",
-    surfaceAccent: "glass-accent",
-    surfaceSuccess: "glass-success",
-    surfaceWarning: "glass-warning",
-    surfaceDanger: "glass-danger",
-    roundedGlass: "rounded-glass",
-    roundedGlassLg: "rounded-glass-lg",
-    textSecondary: "text-text-secondary",
-    textMuted: "text-text-muted",
     accentBackground: "bg-accent",
     accentText: "text-accent",
     standardTransition: "transition-all duration-200",
+    focusRing: "focus-visible:ring-2 focus-visible:ring-accent/60",
   },
   componentMarkers: [
     "AppShell",
@@ -46,13 +52,16 @@ export const designTokens = {
   ] as const,
   runtimeValidation: {
     prohibitedClassPatterns: [
-      /(^|.*:)(bg-primary(?:\/\d+)?|text-primary-foreground(?:\/\d+)?|bg-secondary(?:\/\d+)?|text-secondary-foreground(?:\/\d+)?|bg-destructive(?:\/\d+)?|text-destructive-foreground(?:\/\d+)?|border-input|bg-background|ring-ring|ring-offset-background|text-muted-foreground(?:\/\d+)?|text-foreground(?:\/\d+)?|data-\[state=open\]:bg-secondary)(?:$|\s)/,
+      /(^|.*:)(bg-primary(?:\/\d+)?|text-primary-foreground(?:\/\d+)?|bg-secondary(?:\/\d+)?|text-secondary-foreground(?:\/\d+)?|bg-destructive(?:\/\d+)?|text-destructive-foreground(?:\/\d+)?|border-input|bg-background|ring-ring|ring-offset-background|text-muted-foreground(?:\/\d+)?|text-foreground(?:\/\d+)?|text-white(?:\/\d+)?|text-black(?:\/\d+)?|bg-gray-\d+(?:\/\d+)?)(?:$|\s)/,
     ],
   },
 } as const
 
 export type DesignTokens = typeof designTokens
 export type DesignColorToken = keyof typeof designTokens.colors
+export type DesignTextTone = keyof typeof designTokens.textTones
+export type DesignSurfaceVariant = keyof typeof designTokens.surfaceVariants
+export type DesignRadiusVariant = keyof typeof designTokens.radii
 export type DesignUtilityToken =
   (typeof designTokens.utilities)[keyof typeof designTokens.utilities]
 export type DesignComponentMarker =

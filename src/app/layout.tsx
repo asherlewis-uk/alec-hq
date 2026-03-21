@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { DesignSystemOverlay } from "@/components/dev/DesignSystemOverlay";
 import { PwaInstallGate } from "@/components/pwa/PwaInstallGate";
 
 const metadataBase =
@@ -43,6 +44,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <PwaInstallGate>{children}</PwaInstallGate>
+        <DesignSystemOverlay />
       </body>
     </html>
   );

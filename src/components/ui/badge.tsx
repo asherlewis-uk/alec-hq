@@ -1,17 +1,30 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
+import {
+  designMarker,
+  focusRingClass,
+  radiusClass,
+  surfaceClass,
+  textToneClass,
+  transitionClass,
+} from "@/lib/design/classes"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/60",
+  cn(
+    "inline-flex items-center border px-2.5 py-0.5 text-xs font-semibold",
+    radiusClass("pill"),
+    transitionClass(),
+    focusRingClass()
+  ),
   {
     variants: {
       variant: {
-        default: "glass-accent border-orange-400/30 text-primary",
-        secondary: "glass border-white/15 text-secondary",
-        destructive: "glass-danger border-red-400/30 text-primary",
-        outline: "border-white/20 text-primary",
+        default: cn(surfaceClass("accent"), "border-orange-400/30", textToneClass("primary")),
+        secondary: cn(surfaceClass("default"), "border-white/15", textToneClass("secondary")),
+        destructive: cn(surfaceClass("danger"), "border-red-400/30", textToneClass("primary")),
+        outline: cn("border-white/20", textToneClass("primary")),
       },
     },
     defaultVariants: {
@@ -26,7 +39,11 @@ export interface BadgeProps
 
 function Badge({ className, variant, ...props }: BadgeProps) {
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+    <div
+      {...designMarker("Badge")}
+      className={cn(badgeVariants({ variant }), className)}
+      {...props}
+    />
   )
 }
 

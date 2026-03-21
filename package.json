@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "ci": "npm run lint && npm run typecheck && npm run build",
+    "design:check": "node scripts/design-system-snapshot.mjs",
+    "ci": "npm run lint && npm run typecheck && npm run design:check && npm run build",
     "test:smoke": "playwright test -c playwright.config.ts"
   },
   "dependencies": {
