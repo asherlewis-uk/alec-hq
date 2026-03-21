@@ -8,6 +8,7 @@ import { QuickAddSheet } from "@/components/dashboard/QuickAddSheet";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiRequest } from "@/lib/api/client";
+import { designMarker } from "@/lib/design/classes";
 
 const pathLabels: Record<string, string> = {
   "/": "Dashboard",
@@ -34,7 +35,7 @@ export function TopBar() {
   };
 
   return (
-    <div className="flex items-center justify-between p-4 md:p-6">
+    <div {...designMarker("TopBar")} className="flex items-center justify-between p-4 md:p-6">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <h2 className="text-2xl font-bold text-primary">{getLabel()}</h2>
       </motion.div>

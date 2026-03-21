@@ -46,10 +46,10 @@ export default function SharePage() {
     return (
       <div className="bg-gradient-to-br from-[#0d0d1a] to-[#1a0a00] min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-2">
+          <h1 className="text-2xl font-bold text-primary mb-2">
             Asset Not Found
           </h1>
-          <p className="text-text-secondary">
+          <p className="text-secondary">
             {error ?? "This asset is either private or does not exist"}
           </p>
         </div>

@@ -52,7 +52,6 @@ export default function RigDetailPage() {
   };
 
   const handleTogglePublic = async () => {
-    // Catalog visibility is not workspace-editable
   };
 
   if (isLoading) {
@@ -66,7 +65,7 @@ export default function RigDetailPage() {
 
   if (!catalogAsset) {
     return (
-      <div className="text-center text-text-secondary py-12">
+      <div className="text-center text-secondary py-12">
         Asset not found
       </div>
     );
@@ -80,10 +79,9 @@ export default function RigDetailPage() {
         onTogglePublic={handleTogglePublic}
       />
 
-      {/* Catalog Specs */}
       {catalogAsset.specs && Object.keys(catalogAsset.specs).length > 0 && (
         <div className="glass rounded-glass p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">
+          <h3 className="text-lg font-semibold text-primary mb-4">
             Specifications
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -92,15 +90,14 @@ export default function RigDetailPage() {
                 key={key}
                 className="flex justify-between text-sm border-b border-white/10 pb-2"
               >
-                <span className="text-text-secondary">{key}</span>
-                <span className="text-white font-mono">{value}</span>
+                <span className="text-secondary">{key}</span>
+                <span className="text-primary font-mono">{value}</span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Workspace data links */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Link
           href="/workspace/configurations"
@@ -112,7 +109,7 @@ export default function RigDetailPage() {
           >
             ⚙️ Configurations
           </Badge>
-          <p className="text-sm text-text-secondary">
+          <p className="text-sm text-secondary">
             View workspace configurations
           </p>
         </Link>
@@ -126,7 +123,7 @@ export default function RigDetailPage() {
           >
             📋 Logs
           </Badge>
-          <p className="text-sm text-text-secondary">View workspace logs</p>
+          <p className="text-sm text-secondary">View workspace logs</p>
         </Link>
         <Link
           href="/workspace/wishlist"
@@ -138,7 +135,7 @@ export default function RigDetailPage() {
           >
             ⭐ Wishlist
           </Badge>
-          <p className="text-sm text-text-secondary">View workspace wishlist</p>
+          <p className="text-sm text-secondary">View workspace wishlist</p>
         </Link>
       </div>
     </div>

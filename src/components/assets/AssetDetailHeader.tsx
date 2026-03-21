@@ -32,17 +32,15 @@ export function AssetDetailHeader({ asset, onDelete, onTogglePublic }: AssetDeta
       animate={{ opacity: 1, y: 0 }}
       className="glass rounded-glass p-6 md:p-8 mb-6"
     >
-      {/* Header Row */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-4">
           <span className="text-5xl">{getCategoryEmoji(asset.category)}</span>
           <div>
-            <p className="text-sm text-text-secondary">{getCategoryLabel(asset.category)}</p>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mt-1">{asset.name}</h1>
+            <p className="text-sm text-secondary">{getCategoryLabel(asset.category)}</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-primary mt-1">{asset.name}</h1>
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex gap-2">
           {asset.isPublic && shareUrl && (
             <Button
@@ -51,7 +49,7 @@ export function AssetDetailHeader({ asset, onDelete, onTogglePublic }: AssetDeta
               onClick={() => {
                 navigator.clipboard.writeText(shareUrl)
               }}
-              className="border-white/20 text-white hover:bg-white/10"
+              className="border-white/20 hover:glass-accent"
             >
               <Share2 className="w-4 h-4 mr-1" />
               Copy Link
@@ -61,7 +59,7 @@ export function AssetDetailHeader({ asset, onDelete, onTogglePublic }: AssetDeta
             size="sm"
             variant="outline"
             onClick={() => onTogglePublic(!asset.isPublic)}
-            className="border-white/20 text-white hover:bg-white/10"
+            className="border-white/20 hover:glass-accent"
           >
             <Eye className="w-4 h-4 mr-1" />
             {asset.isPublic ? 'Public' : 'Private'}
@@ -78,21 +76,19 @@ export function AssetDetailHeader({ asset, onDelete, onTogglePublic }: AssetDeta
         </div>
       </div>
 
-      {/* Metadata */}
       <div className="flex flex-wrap gap-3 items-center">
         <Badge className="bg-accent/20 text-accent border-accent/30 border">{asset.status}</Badge>
-        <span className="text-sm text-text-secondary">
+        <span className="text-sm text-secondary">
           Created {formatDate(asset.createdAt)}
         </span>
         {asset.purchasePrice && (
-          <span className="text-sm text-text-secondary">
+          <span className="text-sm text-secondary">
             • ${asset.purchasePrice.toLocaleString()}
           </span>
         )}
       </div>
 
-      {/* Notes */}
-      {asset.notes && <p className="text-sm text-text-secondary mt-4 italic">{asset.notes}</p>}
+      {asset.notes && <p className="text-sm text-secondary mt-4 italic">{asset.notes}</p>}
     </motion.div>
   )
 }

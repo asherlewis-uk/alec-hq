@@ -1,0 +1,18 @@
+{
+  "trackedMarkers": [
+    "AppShell",
+    "Badge",
+    "Button",
+    "Card",
+    "CardContent",
+    "CardFooter",
+    "CardHeader",
+    "Input",
+    "PwaInstallGate",
+    "SheetContent",
+    "Sidebar",
+    "TopBar"
+  ],
+  "prohibitedTokenCount": 0,
+  "overlayRendered": true
+}

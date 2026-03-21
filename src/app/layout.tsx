@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { DesignSystemOverlay } from "@/components/dev/DesignSystemOverlay";
 import { PwaInstallGate } from "@/components/pwa/PwaInstallGate";
 
 const metadataBase =
@@ -7,6 +8,8 @@ const metadataBase =
   process.env.NEXT_PUBLIC_APP_URL.startsWith("http")
     ? new URL(process.env.NEXT_PUBLIC_APP_URL)
     : undefined;
+
+const shouldRenderDesignOverlay = process.env.NODE_ENV !== "production";
 
 export const metadata: Metadata = {
   metadataBase,
@@ -43,6 +46,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <PwaInstallGate>{children}</PwaInstallGate>
+        {shouldRenderDesignOverlay ? <DesignSystemOverlay /> : null}
       </body>
     </html>
   );

@@ -19,22 +19,19 @@ export function AssetCard({ asset }: AssetCardProps) {
         whileHover={{ y: -4 }}
         className={`glass ${getStatusColor(asset.status)} rounded-glass p-4 cursor-pointer transition-all duration-200 h-full`}
       >
-        {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div>
-            <p className="text-xs text-text-secondary">{getCategoryLabel(asset.category)}</p>
-            <h3 className="text-lg font-bold text-white mt-1 line-clamp-2">{asset.name}</h3>
+            <p className="text-xs text-secondary">{getCategoryLabel(asset.category)}</p>
+            <h3 className="text-lg font-bold text-primary mt-1 line-clamp-2">{asset.name}</h3>
           </div>
           <span className="text-2xl">{getCategoryEmoji(asset.category)}</span>
         </div>
 
-        {/* Status Badge */}
         <Badge variant="outline" className="text-xs bg-white/10 border-white/20">
           {asset.status}
         </Badge>
 
-        {/* Footer */}
-        <p className="text-xs text-text-muted mt-4">
+        <p className="text-xs text-muted mt-4">
           Updated {new Date(asset.updatedAt).toLocaleDateString()}
         </p>
       </motion.div>

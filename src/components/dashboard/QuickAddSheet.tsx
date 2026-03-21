@@ -67,8 +67,8 @@ export function QuickAddSheet({
       {children}
       <SheetContent className="bg-gradient-to-b from-white/10 to-white/5 border-white/20">
         <SheetHeader>
-          <SheetTitle className="text-white">Link Catalog Asset</SheetTitle>
-          <SheetDescription className="text-text-secondary">
+          <SheetTitle className="text-primary">Link Catalog Asset</SheetTitle>
+          <SheetDescription className="text-secondary">
             Search the catalog and link an asset to your workspace
           </SheetDescription>
         </SheetHeader>
@@ -78,7 +78,7 @@ export function QuickAddSheet({
             placeholder="Search catalog..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-white/5 border-white/20 text-white placeholder:text-text-muted"
+            className="bg-white/5 border-white/20 text-primary placeholder:text-muted"
           />
 
           {submitError && <p className="text-red-300 text-sm">{submitError}</p>}
@@ -96,10 +96,10 @@ export function QuickAddSheet({
                   {getCategoryEmoji(asset.category)}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className="text-sm font-medium text-primary truncate">
                     {asset.name}
                   </p>
-                  <p className="text-xs text-text-secondary">
+                  <p className="text-xs text-secondary">
                     {asset.category}
                     {asset.manufacturer ? ` · ${asset.manufacturer}` : ""}
                   </p>
@@ -107,7 +107,7 @@ export function QuickAddSheet({
               </button>
             ))}
             {catalogAssets.length === 0 && (
-              <p className="text-sm text-text-muted text-center py-4">
+              <p className="text-sm text-muted text-center py-4">
                 No catalog assets found
               </p>
             )}
