@@ -151,6 +151,26 @@ function scheduleScan() {
   })
 }
 
+function initializeObserver() {
+  if (typeof document === "undefined" || observer || !document.body) {
+    return false
+  }
+
+  observer = new MutationObserver(() => {
+    scheduleScan()
+  })
+
+  observer.observe(document.body, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: ["class", "style", "data-ui-component"],
+  })
+
+  scheduleScan()
+  return true
+}
+
 export function subscribeToRuntimeMonitor(listener: () => void) {
   listeners.add(listener)
   return () => {
@@ -169,22 +189,58 @@ export function startRuntimeMonitor() {
 
   activeMonitorCount += 1
 
-  if (!observer) {
-    observer = new MutationObserver(() => {
-      scheduleScan()
-    })
+  let disposed = false
+  let removeDeferredSetup: (() => void) | null = null
 
-    observer.observe(document.body, {
-      subtree: true,
-      childList: true,
-      attributes: true,
-      attributeFilter: ["class", "style", "data-ui-component"],
-    })
+  const ensureObserver = () => {
+    if (disposed) {
+      return
+    }
+
+    if (initializeObserver() && removeDeferredSetup) {
+      removeDeferredSetup()
+      removeDeferredSetup = null
+    }
   }
 
-  scheduleScan()
+  if (!initializeObserver()) {
+    const onDocumentReady = () => {
+      ensureObserver()
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", onDocumentReady, {
+        once: true,
+      })
+      removeDeferredSetup = () => {
+        document.removeEventListener("DOMContentLoaded", onDocumentReady)
+      }
+    } else {
+      const intervalId = window.setInterval(() => {
+        if (
+          document.body ||
+          document.readyState === "interactive" ||
+          document.readyState === "complete"
+        ) {
+          window.clearInterval(intervalId)
+          ensureObserver()
+        }
+      }, 0)
+
+      removeDeferredSetup = () => {
+        window.clearInterval(intervalId)
+      }
+    }
+  }
 
   return () => {
+    disposed = true
+
+    if (removeDeferredSetup) {
+      removeDeferredSetup()
+      removeDeferredSetup = null
+    }
+
     activeMonitorCount = Math.max(0, activeMonitorCount - 1)
 
     if (activeMonitorCount === 0 && observer) {
