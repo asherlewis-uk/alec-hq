@@ -56,34 +56,16 @@ export function Dashboard() {
       animate={{ opacity: 1 }}
       className="space-y-6"
     >
-      {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label="Linked Assets"
-          value={assets.length.toString()}
-          emoji="🔗"
-        />
-        <StatCard
-          label="Configurations"
-          value={configurations.length.toString()}
-          emoji="🔧"
-        />
-        <StatCard
-          label="Wishlist"
-          value={wishlist.length.toString()}
-          emoji="⭐"
-        />
-        <StatCard
-          label="Recent Logs"
-          value={logs.length.toString()}
-          emoji="📋"
-        />
+        <StatCard label="Linked Assets" value={assets.length.toString()} emoji="🔗" />
+        <StatCard label="Configurations" value={configurations.length.toString()} emoji="🔧" />
+        <StatCard label="Wishlist" value={wishlist.length.toString()} emoji="⭐" />
+        <StatCard label="Recent Logs" value={logs.length.toString()} emoji="📋" />
       </div>
 
-      {/* Recent workspace assets */}
       {assets.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold text-white mb-4">
+          <h3 className="text-lg font-semibold text-primary mb-4">
             Linked Assets
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -94,20 +76,20 @@ export function Dashboard() {
                 className="glass rounded-glass p-4"
               >
                 <div className="flex items-start justify-between mb-2">
-                  <h4 className="text-white font-medium">
+                  <h4 className="text-primary font-medium">
                     {assetView.catalogAsset?.name ?? "Unnamed asset"}
                   </h4>
-                  <span className="text-xs text-text-secondary bg-white/10 px-2 py-0.5 rounded">
+                  <span className="text-xs text-secondary bg-white/10 px-2 py-0.5 rounded">
                     {assetView.link.localStatus}
                   </span>
                 </div>
                 {assetView.catalogAsset?.category && (
-                  <p className="text-xs text-text-secondary">
+                  <p className="text-xs text-secondary">
                     {assetView.catalogAsset.category}
                   </p>
                 )}
                 {assetView.link.notes && (
-                  <p className="text-sm text-text-muted mt-2 line-clamp-2">
+                  <p className="text-sm text-muted mt-2 line-clamp-2">
                     {assetView.link.notes}
                   </p>
                 )}
@@ -117,10 +99,9 @@ export function Dashboard() {
         </div>
       )}
 
-      {/* Empty State */}
       {assets.length === 0 && (
         <div className="glass rounded-glass p-12 text-center">
-          <p className="text-text-secondary text-lg">
+          <p className="text-secondary text-lg">
             No assets linked yet. Browse the catalog to get started!
           </p>
         </div>

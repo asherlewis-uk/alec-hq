@@ -35,7 +35,6 @@ export function Sidebar() {
 
   return (
     <div className="flex flex-col h-full p-6 bg-black/20">
-      {/* Logo */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -44,10 +43,9 @@ export function Sidebar() {
         <h1 className="text-3xl font-bold bg-gradient-to-r from-accent to-orange-400 bg-clip-text text-transparent">
           ALEC
         </h1>
-        <p className="text-xs text-text-secondary mt-1">Command Center</p>
+        <p className="text-xs text-secondary mt-1">Command Center</p>
       </motion.div>
 
-      {/* Navigation */}
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -64,13 +62,13 @@ export function Sidebar() {
                 <Icon
                   className={cn(
                     "w-5 h-5",
-                    isActive ? "text-accent" : "text-text-secondary",
+                    isActive ? "text-accent" : "text-secondary",
                   )}
                 />
                 <span
                   className={cn(
                     "text-sm font-medium",
-                    isActive ? "text-white" : "text-text-secondary",
+                    isActive ? "text-primary" : "text-secondary",
                   )}
                 >
                   {item.label}
@@ -81,7 +79,6 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Footer */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -93,7 +90,7 @@ export function Sidebar() {
             {workspace.name}
           </p>
         )}
-        <p className="text-xs text-text-muted">ALEC.HQ v2.0</p>
+        <p className="text-xs text-muted">ALEC.HQ v2.0</p>
       </motion.div>
     </div>
   );
