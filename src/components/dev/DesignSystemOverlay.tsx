@@ -58,6 +58,7 @@ export function DesignSystemOverlay() {
         </div>
         <button
           type="button"
+          aria-expanded={isExpanded}
           onClick={() => setIsExpanded((value) => !value)}
           className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-medium transition-all duration-200 hover:glass-accent"
         >
