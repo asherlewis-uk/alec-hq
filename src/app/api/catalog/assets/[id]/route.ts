@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { apiError, apiOk } from "@/lib/server/api-response";
+import { requireWorkspaceFromRequest } from "@/lib/server/auth/session";
 import { getServiceSupabase } from "@/lib/server/supabase";
 import { mapCatalogAssetRow } from "@/lib/server/mappers";
 import { isValidUUID } from "@/lib/server/validation";
@@ -7,7 +8,7 @@ import { isValidUUID } from "@/lib/server/validation";
 export const runtime = "nodejs";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
@@ -16,6 +17,7 @@ export async function GET(
     return apiError(400, "INVALID_ID", "Asset ID must be a valid UUID.");
   }
 
+  const session = await requireWorkspaceFromRequest(request);
   const supabase = getServiceSupabase();
 
   const { data, error } = await supabase
@@ -33,7 +35,7 @@ export async function GET(
     );
   }
 
-  if (!data) {
+  if (!data || (!session && !data.is_public)) {
     return apiError(404, "NOT_FOUND", "Catalog asset not found.");
   }
 
