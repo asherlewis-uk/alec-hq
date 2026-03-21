@@ -46,7 +46,7 @@ export const designTokens = {
   ] as const,
   runtimeValidation: {
     prohibitedClassPatterns: [
-      /(^|.*:)(bg-primary(?:\/\d+)?|text-primary-foreground|bg-secondary(?:\/\d+)?|text-secondary-foreground|bg-destructive(?:\/\d+)?|text-destructive-foreground|border-input|bg-background|ring-ring|ring-offset-background|text-muted-foreground|text-foreground|data-\[state=open\]:bg-secondary)(?:$|\s)/,
+      /(^|.*:)(bg-primary(?:\/\d+)?|text-primary-foreground(?:\/\d+)?|bg-secondary(?:\/\d+)?|text-secondary-foreground(?:\/\d+)?|bg-destructive(?:\/\d+)?|text-destructive-foreground(?:\/\d+)?|border-input|bg-background|ring-ring|ring-offset-background|text-muted-foreground(?:\/\d+)?|text-foreground(?:\/\d+)?|data-\[state=open\]:bg-secondary)(?:$|\s)/,
     ],
   },
 } as const

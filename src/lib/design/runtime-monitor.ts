@@ -107,13 +107,15 @@ function buildViolationMap(root: ParentNode) {
 
 function buildComponentUsage(root: ParentNode) {
   const usage = new Map<string, number>()
+  const approvedMarkers = new Set<DesignComponentMarker>(
+    designTokens.componentMarkers
+  )
 
   root.querySelectorAll<HTMLElement>("[data-ui-component]").forEach((element) => {
-    const marker = element.getAttribute("data-ui-component") as
-      | DesignComponentMarker
-      | null
+    const marker = element.getAttribute("data-ui-component")
 
     if (!marker) return
+    if (!approvedMarkers.has(marker as DesignComponentMarker)) return
 
     usage.set(marker, (usage.get(marker) ?? 0) + 1)
   })

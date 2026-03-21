@@ -30,8 +30,6 @@ export function DesignSystemOverlay() {
       setSnapshot(getRuntimeMonitorSnapshot())
     })
 
-    setSnapshot(getRuntimeMonitorSnapshot())
-
     return () => {
       unsubscribe()
       stopMonitoring()
