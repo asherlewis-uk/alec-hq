@@ -73,7 +73,7 @@ function PinInput({
           onFocus={(e) => e.target.select()}
           disabled={disabled}
           autoFocus={i === 0}
-          className="w-12 h-14 text-center text-2xl font-mono rounded-xl bg-white/10 border border-white/20 text-white focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-colors disabled:opacity-40"
+          className="w-12 h-14 text-center text-2xl font-mono rounded-glass bg-white/10 border border-white/20 text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-colors disabled:opacity-40"
           aria-label={`PIN digit ${i + 1}`}
         />
       ))}
@@ -132,12 +132,11 @@ function LoginContent() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#0d0d1a] to-[#1a0a00] flex items-center justify-center px-4">
       <div className="glass rounded-glass w-full max-w-sm p-8 text-center">
-        <h1 className="text-3xl font-bold text-white">ALEC.HQ</h1>
+        <h1 className="text-3xl font-bold text-primary">ALEC.HQ</h1>
 
         {selectedSlug === null ? (
-          /* ── Workspace Selection ─────────────────── */
           <>
-            <p className="text-text-secondary mt-2">Select your workspace</p>
+            <p className="text-secondary mt-2">Select your workspace</p>
             <div className="mt-8 space-y-3">
               {WORKSPACES.map((ws) => (
                 <button
@@ -149,17 +148,16 @@ function LoginContent() {
                   <span className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-bold text-lg">
                     {ws.label[0]}
                   </span>
-                  <span className="text-white font-medium">{ws.label}</span>
+                  <span className="text-primary font-medium">{ws.label}</span>
                 </button>
               ))}
             </div>
           </>
         ) : (
-          /* ── PIN Entry ──────────────────────────── */
           <>
-            <p className="text-text-secondary mt-2">
+            <p className="text-secondary mt-2">
               Enter PIN for{" "}
-              <span className="text-white font-medium">
+              <span className="text-primary font-medium">
                 {WORKSPACES.find((w) => w.slug === selectedSlug)?.label}
               </span>
             </p>
@@ -175,14 +173,14 @@ function LoginContent() {
                   variant="outline"
                   onClick={handleBack}
                   disabled={isSubmitting}
-                  className="flex-1 border-white/20 text-white hover:bg-white/10"
+                  className="flex-1"
                 >
                   Back
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting || !canSubmit}
-                  className="flex-1 bg-accent hover:bg-accent/90 text-black rounded-glass"
+                  className="flex-1"
                 >
                   {isSubmitting ? "Unlocking..." : "Unlock"}
                 </Button>

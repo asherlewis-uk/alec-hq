@@ -36,7 +36,7 @@ export function TopBar() {
   return (
     <div className="flex items-center justify-between p-4 md:p-6">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-        <h2 className="text-2xl font-bold text-white">{getLabel()}</h2>
+        <h2 className="text-2xl font-bold text-primary">{getLabel()}</h2>
       </motion.div>
 
       <div className="flex items-center gap-3">
@@ -54,17 +54,13 @@ export function TopBar() {
               setIsLoggingOut(false);
             }
           }}
-          className="border-white/20 text-white hover:bg-white/10"
+          className="border-white/20"
         >
           <LogOut className="w-4 h-4 mr-2" />
           {isLoggingOut ? "Signing out..." : "Sign out"}
         </Button>
         <QuickAddSheet open={isOpen} onOpenChange={setIsOpen}>
-          <Button
-            onClick={() => setIsOpen(true)}
-            className="bg-accent hover:bg-accent/90 text-black rounded-glass"
-            size="sm"
-          >
+          <Button onClick={() => setIsOpen(true)} size="sm">
             <Plus className="w-4 h-4 mr-2" />
             Link Asset
           </Button>

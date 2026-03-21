@@ -148,7 +148,7 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#ffb27a]">
                 Installed App Required
               </p>
-              <h1 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
+              <h1 className="mt-3 text-3xl font-bold text-primary sm:text-4xl">
                 Open ALEC.HQ as an app.
               </h1>
             </div>
@@ -157,7 +157,7 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
             </div>
           </div>
 
-          <p className="mt-5 text-base leading-7 text-[rgba(255,255,255,0.72)]">
+          <p className="mt-5 text-base leading-7 text-secondary">
             Browser access is disabled. Add ALEC.HQ to your home screen, then
             launch it from the installed app icon so it opens in standalone
             mode.
@@ -170,11 +170,11 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
 
           {platform === "ios" && (
             <div className="mt-6 rounded-[24px] border border-white/10 bg-white/5 p-5">
-              <div className="flex items-center gap-3 text-white">
+              <div className="flex items-center gap-3 text-primary">
                 <Share2 className="h-5 w-5 text-[#ffb27a]" />
                 <h2 className="text-lg font-semibold">iPhone / iPad steps</h2>
               </div>
-              <ol className="mt-4 space-y-3 text-sm leading-6 text-[rgba(255,255,255,0.74)]">
+              <ol className="mt-4 space-y-3 text-sm leading-6 text-secondary">
                 <li>1. Open this site in Safari.</li>
                 <li>2. Tap the Share button.</li>
                 <li>3. Choose Add to Home Screen.</li>
@@ -185,11 +185,11 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
 
           {platform === "android" && (
             <div className="mt-6 rounded-[24px] border border-white/10 bg-white/5 p-5">
-              <div className="flex items-center gap-3 text-white">
+              <div className="flex items-center gap-3 text-primary">
                 <Chrome className="h-5 w-5 text-[#ffb27a]" />
                 <h2 className="text-lg font-semibold">Android steps</h2>
               </div>
-              <ol className="mt-4 space-y-3 text-sm leading-6 text-[rgba(255,255,255,0.74)]">
+              <ol className="mt-4 space-y-3 text-sm leading-6 text-secondary">
                 <li>1. Use Chrome or another install-capable browser.</li>
                 <li>2. Tap Install App or open the browser menu.</li>
                 <li>3. Choose Install app or Add to Home screen.</li>
@@ -200,13 +200,13 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
 
           {platform === "desktop" && (
             <div className="mt-6 rounded-[24px] border border-white/10 bg-white/5 p-5">
-              <div className="flex items-center gap-3 text-white">
+              <div className="flex items-center gap-3 text-primary">
                 <Smartphone className="h-5 w-5 text-[#ffb27a]" />
                 <h2 className="text-lg font-semibold">
                   Desktop or unsupported browser
                 </h2>
               </div>
-              <p className="mt-4 text-sm leading-6 text-[rgba(255,255,255,0.74)]">
+              <p className="mt-4 text-sm leading-6 text-secondary">
                 ALEC.HQ is locked to installed app mode. Install it from a
                 PWA-capable browser, or open this URL on iPhone Safari or
                 Android Chrome and add it to the home screen first.
@@ -219,7 +219,7 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
               <Button
                 onClick={handleInstall}
                 disabled={isPromptPending}
-                className="h-12 rounded-[18px] bg-accent text-black hover:bg-accent/90"
+                className="h-12 rounded-[18px]"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 {isPromptPending ? "Waiting for install..." : "Install App"}
@@ -229,7 +229,7 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
             <Button
               variant="outline"
               onClick={handleRefreshStandaloneState}
-              className="h-12 rounded-[18px] border-white/20 bg-white/5 text-white hover:bg-white/10"
+              className="h-12 rounded-[18px]"
             >
               <CheckCircle2 className="mr-2 h-4 w-4" />I Opened the Installed
               App

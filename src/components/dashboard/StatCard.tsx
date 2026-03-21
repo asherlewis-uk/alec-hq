@@ -16,8 +16,8 @@ export function StatCard({ label, value, emoji }: StatCardProps) {
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-text-secondary text-sm">{label}</p>
-          <h3 className="text-3xl font-bold text-white mt-2">{value}</h3>
+          <p className="text-secondary text-sm">{label}</p>
+          <h3 className="text-3xl font-bold text-primary mt-2">{value}</h3>
         </div>
         <span className="text-3xl">{emoji}</span>
       </div>
