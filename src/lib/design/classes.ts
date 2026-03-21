@@ -2,6 +2,7 @@ import {
   designTokens,
   type DesignComponentMarker,
   type DesignRadiusVariant,
+  type DesignSheetSide,
   type DesignSurfaceVariant,
   type DesignTextTone,
 } from "@/lib/design/tokens"
@@ -16,6 +17,10 @@ export function textToneClass(tone: DesignTextTone = "primary") {
 
 export function radiusClass(radius: DesignRadiusVariant = "glass") {
   return designTokens.radii[radius]
+}
+
+export function sheetSideRadiusClass(side: DesignSheetSide) {
+  return designTokens.sheetSideRadii[side]
 }
 
 export function transitionClass() {

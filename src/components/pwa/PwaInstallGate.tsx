@@ -141,19 +141,22 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
     platform === "android" && installPromptEvent !== null;
 
   return (
-    <div {...designMarker("PwaInstallGate")} className="fixed inset-0 z-[100] overflow-y-auto bg-[radial-gradient(circle_at_top,_rgba(255,107,0,0.28),_transparent_38%),linear-gradient(135deg,_#090913_0%,_#1a0a00_100%)]">
+    <div
+      {...designMarker("PwaInstallGate")}
+      className="fixed inset-0 z-[100] overflow-y-auto bg-gradient-to-br from-[#0d0d1a] to-[#1a0a00]"
+    >
       <div className="mx-auto flex min-h-screen w-full max-w-xl items-center px-4 py-8">
         <section className="glass w-full rounded-[28px] border border-white/15 p-6 shadow-2xl sm:p-8">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#ffb27a]">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-accent">
                 Installed App Required
               </p>
               <h1 className="mt-3 text-3xl font-bold text-primary sm:text-4xl">
                 Open ALEC.HQ as an app.
               </h1>
             </div>
-            <div className="rounded-full border border-white/15 bg-white/5 p-3 text-[#ffb27a]">
+            <div className="rounded-full border border-white/15 bg-white/5 p-3 text-accent">
               <MonitorSmartphone className="h-6 w-6" />
             </div>
           </div>
@@ -164,7 +167,7 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
             mode.
           </p>
 
-          <div className="mt-6 rounded-[22px] border border-[#ff6b00]/30 bg-[#ff6b00]/10 p-4 text-sm text-[#ffd7bd]">
+          <div className="mt-6 rounded-[22px] border border-accent/30 bg-accent/10 p-4 text-sm text-primary">
             Status: browser mode detected. This session stays blocked until
             ALEC.HQ is opened from its installed app icon.
           </div>
@@ -172,7 +175,7 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
           {platform === "ios" && (
             <div className="mt-6 rounded-[24px] border border-white/10 bg-white/5 p-5">
               <div className="flex items-center gap-3 text-primary">
-                <Share2 className="h-5 w-5 text-[#ffb27a]" />
+                <Share2 className="h-5 w-5 text-accent" />
                 <h2 className="text-lg font-semibold">iPhone / iPad steps</h2>
               </div>
               <ol className="mt-4 space-y-3 text-sm leading-6 text-secondary">
@@ -187,7 +190,7 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
           {platform === "android" && (
             <div className="mt-6 rounded-[24px] border border-white/10 bg-white/5 p-5">
               <div className="flex items-center gap-3 text-primary">
-                <Chrome className="h-5 w-5 text-[#ffb27a]" />
+                <Chrome className="h-5 w-5 text-accent" />
                 <h2 className="text-lg font-semibold">Android steps</h2>
               </div>
               <ol className="mt-4 space-y-3 text-sm leading-6 text-secondary">
@@ -202,7 +205,7 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
           {platform === "desktop" && (
             <div className="mt-6 rounded-[24px] border border-white/10 bg-white/5 p-5">
               <div className="flex items-center gap-3 text-primary">
-                <Smartphone className="h-5 w-5 text-[#ffb27a]" />
+                <Smartphone className="h-5 w-5 text-accent" />
                 <h2 className="text-lg font-semibold">
                   Desktop or unsupported browser
                 </h2>

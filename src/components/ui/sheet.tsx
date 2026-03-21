@@ -8,7 +8,7 @@ import { X } from "lucide-react"
 import {
   designMarker,
   focusRingClass,
-  radiusClass,
+  sheetSideRadiusClass,
   surfaceClass,
   textToneClass,
   transitionClass,
@@ -38,18 +38,27 @@ SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
 const sheetVariants = cva(
   cn(
     "fixed z-50 gap-4 p-6 shadow-lg data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=closed]:animate-out data-[state=open]:animate-in",
-    surfaceClass("default"),
-    radiusClass("glass")
+    surfaceClass("default")
   ),
   {
     variants: {
       side: {
-        top: "inset-x-0 top-0 border-b border-white/10 data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
-        bottom:
-          "inset-x-0 bottom-0 border-t border-white/10 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-        left: "inset-y-0 left-0 h-full w-3/4 border-r border-white/10 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
-        right:
-          "inset-y-0 right-0 h-full w-3/4 border-l border-white/10 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+        top: cn(
+          sheetSideRadiusClass("top"),
+          "inset-x-0 top-0 border-b border-white/10 data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top"
+        ),
+        bottom: cn(
+          sheetSideRadiusClass("bottom"),
+          "inset-x-0 bottom-0 border-t border-white/10 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom"
+        ),
+        left: cn(
+          sheetSideRadiusClass("left"),
+          "inset-y-0 left-0 h-full w-3/4 border-r border-white/10 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm"
+        ),
+        right: cn(
+          sheetSideRadiusClass("right"),
+          "inset-y-0 right-0 h-full w-3/4 border-l border-white/10 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm"
+        ),
       },
     },
     defaultVariants: {

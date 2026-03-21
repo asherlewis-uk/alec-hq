@@ -28,7 +28,8 @@ export function AppShell({ children }: AppShellProps) {
           setCurrentWorkspace(data.workspace);
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error("Session fetch failed:", error);
       });
   }, [setCurrentWorkspace]);
 

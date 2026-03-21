@@ -21,7 +21,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
           textToneClass("primary"),
           transitionClass(),
           focusRingClass(),
-          "focus-visible:border-accent focus-visible:outline-none focus-visible:ring-1",
+          "focus-visible:border-accent focus-visible:outline-none",
           className
         )}
         ref={ref}

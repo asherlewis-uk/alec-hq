@@ -17,6 +17,12 @@ export const designTokens = {
     glassLg: "rounded-glass-lg",
     pill: "rounded-full",
   },
+  sheetSideRadii: {
+    top: "rounded-b-[20px]",
+    bottom: "rounded-t-[20px]",
+    left: "rounded-r-[20px]",
+    right: "rounded-l-[20px]",
+  },
   textTones: {
     primary: "text-primary",
     secondary: "text-secondary",
@@ -62,6 +68,7 @@ export type DesignColorToken = keyof typeof designTokens.colors
 export type DesignTextTone = keyof typeof designTokens.textTones
 export type DesignSurfaceVariant = keyof typeof designTokens.surfaceVariants
 export type DesignRadiusVariant = keyof typeof designTokens.radii
+export type DesignSheetSide = keyof typeof designTokens.sheetSideRadii
 export type DesignUtilityToken =
   (typeof designTokens.utilities)[keyof typeof designTokens.utilities]
 export type DesignComponentMarker =

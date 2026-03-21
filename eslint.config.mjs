@@ -3,7 +3,36 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
 const prohibitedTokenPattern =
-  /(^|\s)(bg-primary(?:\/\d+)?|text-primary-foreground(?:\/\d+)?|bg-secondary(?:\/\d+)?|text-secondary-foreground(?:\/\d+)?|bg-destructive(?:\/\d+)?|text-destructive-foreground(?:\/\d+)?|border-input|bg-background|ring-ring|ring-offset-background|text-muted-foreground(?:\/\d+)?|text-foreground(?:\/\d+)?|text-white(?:\/\d+)?|text-black(?:\/\d+)?|bg-gray-\d+(?:\/\d+)?)(?=\s|$)/;
+  /(^|.*:)(bg-primary(?:\/\d+)?|text-primary-foreground(?:\/\d+)?|bg-secondary(?:\/\d+)?|text-secondary-foreground(?:\/\d+)?|bg-destructive(?:\/\d+)?|text-destructive-foreground(?:\/\d+)?|border-input|bg-background|ring-ring|ring-offset-background|text-muted-foreground(?:\/\d+)?|text-foreground(?:\/\d+)?|text-white(?:\/\d+)?|text-black(?:\/\d+)?|bg-gray-\d+(?:\/\d+)?)(?=\s|$)/;
+
+const inlineStylePropMessage =
+  "Inline style props are forbidden by the UI Constraint Gate.";
+
+function hasStyleProperty(argument) {
+  if (!argument || argument.type !== "ObjectExpression") {
+    return false;
+  }
+
+  return argument.properties.some((property) => {
+    if (property.type === "Property") {
+      if (!property.computed && property.key.type === "Identifier") {
+        return property.key.name === "style";
+      }
+
+      if (property.key.type === "Literal") {
+        return property.key.value === "style";
+      }
+
+      return false;
+    }
+
+    if (property.type === "SpreadElement") {
+      return hasStyleProperty(property.argument);
+    }
+
+    return false;
+  });
+}
 
 const designSystemPlugin = {
   meta: {
@@ -23,8 +52,15 @@ const designSystemPlugin = {
             if (node.name?.name === "style") {
               context.report({
                 node,
-                message:
-                  "Inline style props are forbidden by the UI Constraint Gate.",
+                message: inlineStylePropMessage,
+              });
+            }
+          },
+          JSXSpreadAttribute(node) {
+            if (hasStyleProperty(node.argument)) {
+              context.report({
+                node,
+                message: inlineStylePropMessage,
               });
             }
           },
@@ -44,15 +80,23 @@ const designSystemPlugin = {
             return;
           }
 
-          const match = rawValue.match(prohibitedTokenPattern);
-          if (!match) {
+          const tokens = rawValue
+            .split(/\s+/)
+            .map((token) => token.trim())
+            .filter(Boolean);
+
+          for (const token of tokens) {
+            const match = token.match(prohibitedTokenPattern);
+            if (!match) {
+              continue;
+            }
+
+            context.report({
+              node,
+              message: `Prohibited design token detected: ${match[2]}`,
+            });
             return;
           }
-
-          context.report({
-            node,
-            message: `Prohibited design token detected: ${match[2]}`,
-          });
         }
 
         return {
