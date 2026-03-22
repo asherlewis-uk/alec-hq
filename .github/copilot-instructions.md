@@ -16,14 +16,14 @@ For any non-trivial task, the agent MUST load and comply with:
 * The repository uses a dual-workspace architecture over one Next.js app and one Supabase project.
 * One shared catalog is canonical and cross-workspace.
 * Private workspace data is mutually invisible across workspaces.
-* Architecture context lives in `.dev/CONTEXT.md`.
+* Architecture context lives in `.github/CONTEXT.md`.
 * Boundary enforcement is defined by `.github/gates/boundary-guard.agent.md`.
 
 ## Boundary Rules
 
 For any change affecting schemas, migrations, queries, route handlers, auth/session wiring, hooks, stores, or tests that touch catalog versus workspace-private behavior:
 
-1. Read `.dev/CONTEXT.md`.
+1. Read `.github/CONTEXT.md`.
 2. Load `.github/gates/boundary-guard.agent.md` and comply with it.
 3. Classify each touched artifact as `CATALOG_SHARED`, `WORKSPACE_PRIVATE`, or `OVERLAY_STRUCTURE`.
 4. Treat `UNKNOWN` classification as a hard stop.
