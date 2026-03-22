@@ -7,10 +7,11 @@ Dual-workspace command center for tracking garage/rig assets, logs, configuratio
 - Next.js App Router + React 19
 - Server-only Supabase data access (service role key never sent to browser)
 - Workspace PIN auth with signed `HttpOnly` session cookie (`alec_workspace_session`)
-- Brute-force protection backed by `auth_attempts` table
+- Process-local server-side throttling for repeated failed workspace login attempts
 - Shared catalog with category-based browsing (`/catalog`)
 - Workspace-private assets, configurations, logs, and wishlist
 - Public share endpoint for explicitly public catalog assets (`/share/[id]`)
+- Canonical public catalog reads under `/api/catalog/**`; `/api/public/assets/[id]` remains a compatibility endpoint for the share page only
 - PWA enabled with generated service worker at build time
 
 ## Required Environment Variables

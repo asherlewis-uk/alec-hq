@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { apiError } from "@/lib/server/api-response";
 import { setWorkspaceSessionCookie } from "@/lib/server/auth/session";
 import {
+  clearWorkspaceLoginRateLimit,
+  getWorkspaceLoginRateLimitKey,
+  getWorkspaceLoginRateLimitStatus,
+  recordWorkspaceLoginFailure,
+} from "@/lib/server/auth/workspace-login-rate-limit";
+import {
   validateWorkspaceLoginInput,
   ValidationError,
 } from "@/lib/server/validation";
@@ -13,15 +19,43 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const input = validateWorkspaceLoginInput(body);
+    const rateLimitKey = getWorkspaceLoginRateLimitKey(
+      request,
+      input.workspaceSlug,
+    );
+    const rateLimitStatus = getWorkspaceLoginRateLimitStatus(rateLimitKey);
+
+    if (rateLimitStatus.blocked) {
+      return apiError(
+        429,
+        "TOO_MANY_ATTEMPTS",
+        "Too many login attempts. Try again later.",
+        rateLimitStatus.retryAfterSeconds
+          ? { retryAfterSeconds: rateLimitStatus.retryAfterSeconds }
+          : undefined,
+      );
+    }
+
     const workspace = await verifyWorkspacePin(input.workspaceSlug, input.pin);
 
     if (!workspace) {
-      return apiError(
-        401,
-        "INVALID_CREDENTIALS",
-        "Incorrect workspace or PIN.",
-      );
+      const nextRateLimitStatus = recordWorkspaceLoginFailure(rateLimitKey);
+
+      if (nextRateLimitStatus.blocked) {
+        return apiError(
+          429,
+          "TOO_MANY_ATTEMPTS",
+          "Too many login attempts. Try again later.",
+          nextRateLimitStatus.retryAfterSeconds
+            ? { retryAfterSeconds: nextRateLimitStatus.retryAfterSeconds }
+            : undefined,
+        );
+      }
+
+      return apiError(401, "INVALID_CREDENTIALS", "Incorrect workspace or PIN.");
     }
+
+    clearWorkspaceLoginRateLimit(rateLimitKey);
 
     const response = NextResponse.json({
       authenticated: true,

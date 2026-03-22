@@ -44,12 +44,22 @@
 
 ## Route Families
 
-- `/api/catalog/**`: shared catalog reads, public where intended
-- `/api/public/**`: catalog-only public share access
+- `/api/catalog/**`: canonical shared catalog read surface, public where intended
+- `/api/public/**`: compatibility public share surface
 - `/api/workspace/**`: private workspace reads and writes, requires `ensureWorkspaceAccess()`
 - `/api/auth/workspace/login`: workspace PIN login
 - `/api/auth/session`: current workspace session state
 - `/api/auth/logout`: clears workspace session cookie
+
+Current compatibility behavior:
+
+- `/api/public/assets/[id]` remains live for `/share/[id]`.
+- It serves only explicitly public catalog assets and maps the response into the legacy share UI `Asset` plus `Component[]` shape.
+
+Preferred policy for new work:
+
+- Add new public catalog reads under `/api/catalog/**`.
+- Treat `/api/public/**` as share-specific compatibility only unless the runtime is intentionally migrated.
 
 ## Auth and Session Contracts
 
@@ -57,6 +67,7 @@
 - Token payload: `workspaceId`, `workspaceSlug`, `role`, `iat`, `exp`, `version`
 - Signing: HMAC-SHA256 with `SESSION_SECRET`
 - PIN verification: `verifyWorkspacePin()` against `workspace_credentials`
+- Login throttling: process-local server-side throttling on repeated failed workspace login attempts
 - Route guard: `ensureWorkspaceAccess()`
 
 ## Binding Conditions To Preserve
@@ -70,10 +81,10 @@
 ## Migration History
 
 - `202603080001_initial_schema.sql`: legacy schema
-- `202603080002_rate_limit_rpc.sql`: rate limiting RPC
+- `202603080002_rate_limit_rpc.sql`: legacy rate-limiting RPC
 - `202603080003_app_pin.sql`: legacy app PIN auth
 - `202603080004_dual_workspace_catalog.sql`: dual-workspace catalog foundation
-- `202603080005_drop_legacy_tables.sql`: catalog components backfill and legacy drop tranche
+- `202603080005_drop_legacy_tables.sql`: catalog components backfill with legacy-table preservation
 
 ## Environment Variables
 

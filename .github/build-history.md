@@ -1,10 +1,10 @@
 # Dual Workspace Catalog — Build Status
 
 > Tracking document for the dual-workspace migration defined in
-> [`dual-workspace-catalog-execution-spec.md`](dual-workspace-catalog-execution-spec.md).
+> [`execution-spec-full.md`](execution-spec-full.md).
 >
-> **Each phase agent MUST update this document upon completing their phase.**
-> Reference path: `docs/dual-workspace-catalog-execution-spec-build-status.md`
+> Historical note: this file is the retained ledger for the completed dual-workspace migration, not the active task dispatcher for current work.
+> Reference path: `.github/build-history.md`
 
 ---
 
@@ -20,7 +20,7 @@
 | Existing migrations                          | 3 (`202603080001` – `202603080003`)             |
 | Existing route handlers                      | 10                                              |
 | Existing hooks                               | 4                                               |
-| Authoritative spec                           | `docs/dual-workspace-catalog-execution-spec.md` |
+| Authoritative spec                           | `.github/execution-spec-full.md`                |
 
 ---
 
@@ -57,6 +57,9 @@
 | `WORKSPACE_PRIVATE` | 20    | 7 tables (`workspaces`, `workspace_credentials`, `workspace_configurations`, `configuration_slots`, `workspace_logs`, `workspace_wishlist_items`, `workspace_sessions`), auth routes & helpers, workspace CRUD routes, types, mappers |
 | `OVERLAY_STRUCTURE` | 9     | 2 tables (`workspace_asset_links`, `slot_assignments`), overlay routes, overlay types & mappers, 1 hook (`useWorkspaceAssets`)                                                                                                        |
 | `UNKNOWN`           | **0** | —                                                                                                                                                                                                                                     |
+
+> Historical note: some planning-era entries in this ledger mention optional future entities such as `workspace_sessions`. Current schema truth remains the checked-in files under `supabase/migrations/**`.
+> Historical note: the checked-in migration chain preserves legacy tables. `202603080005_drop_legacy_tables.sql` now acts as the `catalog_components` compatibility/backfill tranche despite its retained filename.
 
 ### Binding Constraints Carried Forward
 
@@ -568,11 +571,11 @@ Phase 6 removes the entire legacy execution surface — 16 files fully deleted c
 
 ---
 
-## Agent Instructions
+## Historical Agent Instructions
 
-> **Every phase agent MUST do the following upon completing their phase:**
+> During the original migration, every phase agent was required to do the following upon completing their phase:
 >
-> 1. Update this document at `docs/dual-workspace-catalog-execution-spec-build-status.md`.
+> 1. Update this document at `.github/build-history.md`.
 > 2. Change their phase status from `NOT STARTED` to `COMPLETE`.
 > 3. Record the agent name and completion date.
 > 4. Fill in every row of the Implementation Log table.

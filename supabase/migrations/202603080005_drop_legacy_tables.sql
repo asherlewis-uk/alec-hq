@@ -1,8 +1,9 @@
--- Phase 6b: Drop legacy tables
+-- Phase 6b: Catalog components compatibility tranche
+-- Filename retained for migration-chain continuity.
+-- This migration introduces catalog_components and backfills it from
+-- legacy components while intentionally preserving the legacy tables.
 -- Prerequisites:
---   - All legacy route handlers deleted (Phase 6)
 --   - Public share route migrated to catalog_assets + catalog_components
---   - Legacy hooks, auth helpers, session functions removed
 --   - Data backfilled: assets → catalog_assets (migration 004)
 --   - Data backfilled: components → catalog_components (below)
 
@@ -80,12 +81,6 @@ WHERE EXISTS (
 ON CONFLICT (id) DO NOTHING;
 
 -- =============================================================
--- DROP legacy tables
--- Order: children first (FK dependencies), then parents.
--- Enum types are NOT dropped (shared with dual-workspace tables).
+-- Legacy tables are intentionally preserved for compatibility.
+-- No DROP TABLE statements belong in this migration.
 -- =============================================================
-DROP TABLE IF EXISTS public.wishlist_items CASCADE;
-DROP TABLE IF EXISTS public.asset_logs CASCADE;
-DROP TABLE IF EXISTS public.components CASCADE;
-DROP TABLE IF EXISTS public.assets CASCADE;
-DROP TABLE IF EXISTS public.app_pin CASCADE;

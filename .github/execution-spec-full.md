@@ -1,7 +1,8 @@
 # Dual Workspace Catalog Execution Specification
 
-> **Build status tracker**: [`dual-workspace-catalog-execution-spec-build-status.md`](dual-workspace-catalog-execution-spec-build-status.md)
-> Every phase agent MUST update that document upon completing their phase.
+> **Build history**: [`build-history.md`](build-history.md)
+> Historical note: this phase plan documents a completed migration. For current work, treat `AGENTS.md`, the gate files, checked-in `supabase/migrations/**`, and live `src/**` runtime behavior as canonical.
+> Completion reminders below are retained as historical context only.
 
 ## Objective
 
@@ -1238,7 +1239,7 @@ const publicApiPrefixes = [
 ];
 ```
 
-Do not classify old `api/public/assets` as authoritative after the migration. Replace it with catalog routes.
+Do not classify old `api/public/assets` as authoritative after the migration. In the checked-in runtime, `src/app/api/public/assets/[id]/route.ts` remains as a share-specific compatibility endpoint for `/share/[id]`, but new public catalog reads belong under `/api/catalog/**`.
 
 ## Client State Refactor
 
@@ -1424,7 +1425,7 @@ Persisted context required across execution boundary:
 - naming conventions
 - decision that public share is catalog-only
 
-> **On completion:** update `docs/dual-workspace-catalog-execution-spec-build-status.md` — Phase 1 section.
+> **Historical completion note:** update `.github/build-history.md` — Phase 1 section.
 
 ## Phase 2: Schema Introduction
 
@@ -1448,7 +1449,7 @@ Validation:
 - `catalog_assets` contains migrated legacy assets
 - no legacy tables dropped
 
-> **On completion:** update `docs/dual-workspace-catalog-execution-spec-build-status.md` — Phase 2 section.
+> **Historical completion note:** update `.github/build-history.md` — Phase 2 section.
 
 ## Phase 3: Session Rewire
 
@@ -1469,7 +1470,7 @@ Validation:
 - invalid PIN rejected
 - `/login` redirects when a valid session exists
 
-> **On completion:** update `docs/dual-workspace-catalog-execution-spec-build-status.md` — Phase 3 section.
+> **Historical completion note:** update `.github/build-history.md` — Phase 3 section.
 
 ## Phase 4: New Route Families
 
@@ -1493,7 +1494,7 @@ Validation:
 - public catalog routes work unauthenticated
 - workspace routes require a valid session
 
-> **On completion:** update `docs/dual-workspace-catalog-execution-spec-build-status.md` — Phase 4 section.
+> **Historical completion note:** update `.github/build-history.md` — Phase 4 section.
 
 ## Phase 5: Client And UI Migration
 
@@ -1519,7 +1520,7 @@ Validation:
 - user sees only their own workspace logs and wishlist after sign-in
 - dashboard counts differ correctly between workspace A and workspace B
 
-> **On completion:** update `docs/dual-workspace-catalog-execution-spec-build-status.md` — Phase 5 section.
+> **Historical completion note:** update `.github/build-history.md` — Phase 5 section.
 
 ## Phase 6: Legacy Decommissioning
 
@@ -1532,7 +1533,7 @@ Actions:
 3. Replace stale smoke tests.
 4. Add a later cleanup migration for legacy private tables only after data disposition is decided.
 
-> **On completion:** update `docs/dual-workspace-catalog-execution-spec-build-status.md` — Phase 6 section.
+> **Historical completion note:** update `.github/build-history.md` — Phase 6 section.
 
 ## Testing Specification
 
