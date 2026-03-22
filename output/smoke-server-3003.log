@@ -1,0 +1,11 @@
+
+> alec-hq@0.1.0 start
+> next start
+
+▲ Next.js 16.1.6
+- Local:         http://localhost:3003
+- Network:       http://169.254.83.107:3003
+
+✓ Starting...
+[instrumentation] ALEC.HQ server instrumentation initialized
+✓ Ready in 345ms

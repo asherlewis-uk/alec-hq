@@ -1,0 +1,12 @@
+E2E_BYPASS_PWA_INSTALL_GATE=%E2E_BYPASS_PWA_INSTALL_GATE%  
+
+> alec-hq@0.1.0 start
+> next start
+
+▲ Next.js 16.1.6
+- Local:         http://localhost:3002
+- Network:       http://169.254.83.107:3002
+
+✓ Starting...
+[instrumentation] ALEC.HQ server instrumentation initialized
+✓ Ready in 350ms

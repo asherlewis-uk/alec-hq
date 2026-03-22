@@ -20,6 +20,7 @@ interface BeforeInstallPromptEvent extends Event {
 type DevicePlatform = "ios" | "android" | "desktop";
 
 interface PwaInstallGateProps {
+  automationBypassEnabled?: boolean;
   children: ReactNode;
 }
 
@@ -55,14 +56,24 @@ function isStandaloneMode() {
   );
 }
 
-export function PwaInstallGate({ children }: PwaInstallGateProps) {
+export function PwaInstallGate({
+  automationBypassEnabled = false,
+  children,
+}: PwaInstallGateProps) {
   const [platform, setPlatform] = useState<DevicePlatform>("desktop");
-  const [isStandalone, setIsStandalone] = useState<boolean | null>(null);
+  const [isStandalone, setIsStandalone] = useState<boolean | null>(
+    automationBypassEnabled ? true : null,
+  );
   const [installPromptEvent, setInstallPromptEvent] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [isPromptPending, setIsPromptPending] = useState(false);
 
   useEffect(() => {
+    if (automationBypassEnabled) {
+      setIsStandalone(true);
+      return;
+    }
+
     const standaloneMediaQuery = window.matchMedia(
       "(display-mode: standalone)",
     );
@@ -104,7 +115,7 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
       );
       window.removeEventListener("appinstalled", handleAppInstalled);
     };
-  }, []);
+  }, [automationBypassEnabled]);
 
   const handleInstall = async () => {
     if (!installPromptEvent) {
@@ -133,7 +144,7 @@ export function PwaInstallGate({ children }: PwaInstallGateProps) {
     return null;
   }
 
-  if (isStandalone) {
+  if (automationBypassEnabled || isStandalone) {
     return <>{children}</>;
   }
 

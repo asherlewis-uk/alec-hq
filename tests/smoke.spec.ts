@@ -4,6 +4,9 @@ const wsASlug = process.env.E2E_WORKSPACE_A_SLUG;
 const wsAPin = process.env.E2E_WORKSPACE_A_PIN;
 const wsBSlug = process.env.E2E_WORKSPACE_B_SLUG;
 const wsBPin = process.env.E2E_WORKSPACE_B_PIN;
+const automationBypassHeaders = {
+  "x-e2e-bypass-pwa-install-gate": "1",
+} as const;
 
 const workspaceLabels: Record<string, string> = {
   asher: "Asher",
@@ -50,6 +53,8 @@ async function logout(page: import("@playwright/test").Page) {
 }
 
 test.describe("Multi-workspace smoke tests", () => {
+  test.use({ extraHTTPHeaders: automationBypassHeaders });
+
   test.skip(
     !wsASlug || !wsAPin || !wsBSlug || !wsBPin,
     "Set E2E_WORKSPACE_A_SLUG, E2E_WORKSPACE_A_PIN, E2E_WORKSPACE_B_SLUG, E2E_WORKSPACE_B_PIN",

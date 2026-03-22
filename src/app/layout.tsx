@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 import { DesignSystemOverlay } from "@/components/dev/DesignSystemOverlay";
 import { PwaInstallGate } from "@/components/pwa/PwaInstallGate";
@@ -22,11 +23,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const requestHeaders = await headers();
+  const shouldBypassPwaInstallGateForAutomation =
+    process.env.E2E_BYPASS_PWA_INSTALL_GATE === "1" &&
+    requestHeaders.get("x-e2e-bypass-pwa-install-gate") === "1";
+
   return (
     <html lang="en">
       <head>
@@ -45,7 +51,11 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="antialiased">
-        <PwaInstallGate>{children}</PwaInstallGate>
+        <PwaInstallGate
+          automationBypassEnabled={shouldBypassPwaInstallGateForAutomation}
+        >
+          {children}
+        </PwaInstallGate>
         {shouldRenderDesignOverlay ? <DesignSystemOverlay /> : null}
       </body>
     </html>

@@ -34,13 +34,14 @@ Copy `.env.example` to `.env.local` and populate values.
 
 ## Optional Test Environment Variables
 
-| Variable               | Purpose                             |
-| ---------------------- | ----------------------------------- |
-| `E2E_BASE_URL`         | Base URL for Playwright smoke tests |
-| `E2E_WORKSPACE_A_SLUG` | Workspace A slug for smoke tests    |
-| `E2E_WORKSPACE_A_PIN`  | Workspace A PIN for smoke tests     |
-| `E2E_WORKSPACE_B_SLUG` | Workspace B slug for smoke tests    |
-| `E2E_WORKSPACE_B_PIN`  | Workspace B PIN for smoke tests     |
+| Variable                        | Purpose                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------ |
+| `E2E_BASE_URL`                  | Base URL for Playwright smoke tests                                      |
+| `E2E_BYPASS_PWA_INSTALL_GATE`   | Set to `1` only for automation runs; the smoke suite sends the matching bypass header |
+| `E2E_WORKSPACE_A_SLUG`          | Workspace A slug for smoke tests                                         |
+| `E2E_WORKSPACE_A_PIN`           | Workspace A PIN for smoke tests                                          |
+| `E2E_WORKSPACE_B_SLUG`          | Workspace B slug for smoke tests                                         |
+| `E2E_WORKSPACE_B_PIN`           | Workspace B PIN for smoke tests                                          |
 
 ## Local Development
 
@@ -75,12 +76,15 @@ Set env vars and run:
 
 ```bash
 set E2E_BASE_URL=http://127.0.0.1:3000
+set E2E_BYPASS_PWA_INSTALL_GATE=1
 set E2E_WORKSPACE_A_SLUG=asher
 set E2E_WORKSPACE_A_PIN=<workspace-a-pin>
 set E2E_WORKSPACE_B_SLUG=alec
 set E2E_WORKSPACE_B_PIN=<workspace-b-pin>
 npm run test:smoke
 ```
+
+`E2E_BYPASS_PWA_INSTALL_GATE` is read in `src/app/layout.tsx` and only honored when Playwright sends `x-e2e-bypass-pwa-install-gate: 1` from `tests/smoke.spec.ts`. Leave it unset for normal deployed usage.
 
 ## Deploy (Vercel)
 
