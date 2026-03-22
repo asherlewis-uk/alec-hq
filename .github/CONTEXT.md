@@ -84,7 +84,8 @@ Preferred policy for new work:
 - `202603080002_rate_limit_rpc.sql`: legacy rate-limiting RPC
 - `202603080003_app_pin.sql`: legacy app PIN auth
 - `202603080004_dual_workspace_catalog.sql`: dual-workspace catalog foundation
-- `202603080005_drop_legacy_tables.sql`: catalog components backfill with legacy-table preservation
+- `202603080005_drop_legacy_tables.sql`: historical catalog components backfill tranche that preserved legacy tables at that point in the chain
+- `202603220001_cleanup_verified_legacy_tables.sql`: post-verification cleanup migration that drops `assets`, `components`, `asset_logs`, `wishlist_items`, and `app_pin`
 
 ## Environment Variables
 

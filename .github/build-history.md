@@ -5,6 +5,8 @@
 >
 > Historical note: this file is the retained ledger for the completed dual-workspace migration, not the active task dispatcher for current work.
 > Reference path: `.github/build-history.md`
+>
+> Current schema truth: after `202603220001_cleanup_verified_legacy_tables.sql`, the live schema no longer includes `assets`, `components`, `asset_logs`, `wishlist_items`, or `app_pin`. Preservation references below describe the earlier migration state only.
 
 ---
 
@@ -59,7 +61,7 @@
 | `UNKNOWN`           | **0** | —                                                                                                                                                                                                                                     |
 
 > Historical note: some planning-era entries in this ledger mention optional future entities such as `workspace_sessions`. Current schema truth remains the checked-in files under `supabase/migrations/**`.
-> Historical note: the checked-in migration chain preserves legacy tables. `202603080005_drop_legacy_tables.sql` now acts as the `catalog_components` compatibility/backfill tranche despite its retained filename.
+> Historical note: before `202603220001_cleanup_verified_legacy_tables.sql`, the checked-in migration chain preserved legacy tables. `202603080005_drop_legacy_tables.sql` acts as the `catalog_components` compatibility/backfill tranche despite its retained filename.
 
 ### Binding Constraints Carried Forward
 
@@ -68,7 +70,7 @@
 3. Every private query MUST include a direct `.eq("workspace_id", auth.session.workspaceId)` predicate.
 4. Catalog routes MUST NOT join to workspace-private tables.
 5. Public routes MUST NOT expose workspace overlay data.
-6. Legacy tables remain until cutover verification.
+6. Legacy tables remained in place until cutover verification.
 
 ### Delta
 
@@ -198,7 +200,7 @@ Phase 1 is additive-only. All four files introduce new artifacts alongside legac
 
 ### Reflection
 
-Phase 2 is minimal because Phase 1 was thorough. The migration file, database types, application types, and mappers were all created in Phase 1. The only remaining work was appending the catalog backfill SQL to the migration. The backfill copies legacy `assets` into `catalog_assets` using a direct SELECT with `ON CONFLICT DO NOTHING` for idempotency. Workspace-private fields (`purchase_date`, `purchase_price`, `status`) are intentionally excluded — they belong to workspace-scoped models. Legacy tables remain untouched. TypeScript compilation and linting confirm zero regressions.
+Phase 2 is minimal because Phase 1 was thorough. The migration file, database types, application types, and mappers were all created in Phase 1. The only remaining work was appending the catalog backfill SQL to the migration. The backfill copies legacy `assets` into `catalog_assets` using a direct SELECT with `ON CONFLICT DO NOTHING` for idempotency. Workspace-private fields (`purchase_date`, `purchase_price`, `status`) are intentionally excluded — they belong to workspace-scoped models. Legacy tables remained untouched at that phase boundary. TypeScript compilation and linting confirm zero regressions.
 
 ---
 
@@ -456,7 +458,7 @@ Scenarios:
 
 ### Reflection
 
-Phase 5 delivers the full client-side migration from single-tenant to dual-workspace architecture. The login form now presents a workspace selection step before PIN entry, posting to the Phase 3 workspace login endpoint. Five new hooks replace the legacy global `useAssets` pattern — each hook calls its corresponding Phase 4 API route, and all workspace scoping is enforced server-side. The Zustand store gains `currentWorkspace` state populated from the session endpoint on AppShell mount. The Dashboard now shows four workspace-scoped stat cards (linked assets, configurations, wishlist, logs) instead of the legacy three-card global layout. Four new pages provide dedicated UI for catalog browsing, workspace configurations, workspace wishlist, and workspace logs. The Sidebar navigation was extended with all new routes and displays the active workspace name. No schema, migration, server route, auth helper, mapper, or validation file was modified — all server-side enforcement was in place from Phases 3–4. Legacy hooks and routes remain intact for Phase 6 decommissioning. TypeScript compilation, ESLint, and `next build` all pass with zero errors.
+Phase 5 delivers the full client-side migration from single-tenant to dual-workspace architecture. The login form now presents a workspace selection step before PIN entry, posting to the Phase 3 workspace login endpoint. Five new hooks replace the legacy global `useAssets` pattern — each hook calls its corresponding Phase 4 API route, and all workspace scoping is enforced server-side. The Zustand store gains `currentWorkspace` state populated from the session endpoint on AppShell mount. The Dashboard now shows four workspace-scoped stat cards (linked assets, configurations, wishlist, logs) instead of the legacy three-card global layout. Four new pages provide dedicated UI for catalog browsing, workspace configurations, workspace wishlist, and workspace logs. The Sidebar navigation was extended with all new routes and displays the active workspace name. No schema, migration, server route, auth helper, mapper, or validation file was modified — all server-side enforcement was in place from Phases 3–4. Legacy hooks and routes remained intact at that point, pending Phase 6 decommissioning. TypeScript compilation, ESLint, and `next build` all pass with zero errors.
 
 ## Phase 6 — Legacy Decommissioning
 
@@ -552,7 +554,7 @@ All three binding conditions satisfied.
 
 ### Reflection
 
-Phase 6 removes the entire legacy execution surface — 16 files fully deleted covering 10 route handlers, 2 auth helpers, and 4 client hooks. Sixteen files were modified to sever all remaining references to the legacy layer. The most complex work was migrating the five consumer pages (BC-1): the rig/garage list pages were rewired from `useAssets` to `useWorkspaceAssets` with a `toAsset()` adapter function preserving the `Asset` interface expected by `AssetCard`. The detail pages were converted from fetching sub-resources inline (components, logs, wishlist) to fetching catalog data and linking users to dedicated workspace pages. `QuickAddSheet` underwent the largest structural change — converting from a "create new asset" form to a "browse catalog and link to workspace" flow using `useCatalogAssets` for search and `useWorkspaceAssets().createAssetLink()` for linking. BC-2 was satisfied by removing `/api/auth/pin` from the proxy's public prefixes and deleting the `verifySessionToken` fallback — the proxy now exclusively validates `alec_workspace_session` tokens. BC-3 cleaned dead code from `session.ts` (5 legacy exports removed) and `token.ts` (3 legacy exports removed). Legacy validation functions in `validation.ts` survive as dead code — they still compile but have no route consumers. Legacy database tables remain intact per spec requirements; a future cleanup migration (with explicit approval) will retire them. The build pipeline (lint, typecheck, Next.js build) passes cleanly with zero errors. The codebase net-shrank by 932 lines — the first negative delta in the migration.
+Phase 6 removes the entire legacy execution surface — 16 files fully deleted covering 10 route handlers, 2 auth helpers, and 4 client hooks. Sixteen files were modified to sever all remaining references to the legacy layer. The most complex work was migrating the five consumer pages (BC-1): the rig/garage list pages were rewired from `useAssets` to `useWorkspaceAssets` with a `toAsset()` adapter function preserving the `Asset` interface expected by `AssetCard`. The detail pages were converted from fetching sub-resources inline (components, logs, wishlist) to fetching catalog data and linking users to dedicated workspace pages. `QuickAddSheet` underwent the largest structural change — converting from a "create new asset" form to a "browse catalog and link to workspace" flow using `useCatalogAssets` for search and `useWorkspaceAssets().createAssetLink()` for linking. BC-2 was satisfied by removing `/api/auth/pin` from the proxy's public prefixes and deleting the `verifySessionToken` fallback — the proxy now exclusively validates `alec_workspace_session` tokens. BC-3 cleaned dead code from `session.ts` (5 legacy exports removed) and `token.ts` (3 legacy exports removed). Legacy validation functions in `validation.ts` survive as dead code — they still compile but have no route consumers. At Phase 6 completion, the legacy database tables still remained intact per spec requirements; `202603220001_cleanup_verified_legacy_tables.sql` is the later cleanup migration that retires them. The build pipeline (lint, typecheck, Next.js build) passes cleanly with zero errors. The codebase net-shrank by 932 lines — the first negative delta in the migration.
 
 ---
 
