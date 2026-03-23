@@ -130,8 +130,8 @@ function LoginContent() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#0d0d1a] to-[#1a0a00] flex items-center justify-center px-4">
-      <div className="glass rounded-glass w-full max-w-sm p-8 text-center">
+    <main className="min-h-screen bg-gradient-to-br from-[#0d0d1a] to-[#1a0a00] flex items-start justify-center px-4 pt-16">
+      <div className="glass rounded-glass w-full max-w-sm mx-auto p-8 text-center">
         <h1 className="text-3xl font-bold text-primary">ALEC.HQ</h1>
 
         {selectedSlug === null ? (
