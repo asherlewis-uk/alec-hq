@@ -57,7 +57,7 @@ function PinInput({
   };
 
   return (
-    <div className="flex gap-3 justify-center" onPaste={handlePaste}>
+    <div className="grid grid-cols-6 gap-2 w-full" onPaste={handlePaste}>
       {Array.from({ length }, (_, i) => (
         <input
           key={i}
@@ -73,7 +73,7 @@ function PinInput({
           onFocus={(e) => e.target.select()}
           disabled={disabled}
           autoFocus={i === 0}
-          className="w-12 h-14 text-center text-2xl font-mono rounded-glass bg-white/10 border border-white/20 text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-colors disabled:opacity-40"
+          className="w-full h-14 text-center text-2xl font-mono rounded-glass bg-white/10 border border-white/20 text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-colors disabled:opacity-40"
           aria-label={`PIN digit ${i + 1}`}
         />
       ))}
@@ -130,7 +130,7 @@ function LoginContent() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#0d0d1a] to-[#1a0a00] flex items-start justify-center px-4 pt-16">
+    <main className="min-h-dvh bg-gradient-to-br from-[#0d0d1a] to-[#1a0a00] flex items-start justify-center px-4 pt-16 overflow-y-auto">
       <div className="glass rounded-glass w-full max-w-sm mx-auto p-8 text-center">
         <h1 className="text-3xl font-bold text-primary">ALEC.HQ</h1>
 
@@ -197,7 +197,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-gradient-to-br from-[#0d0d1a] to-[#1a0a00]" />
+        <main className="min-h-dvh bg-gradient-to-br from-[#0d0d1a] to-[#1a0a00]" />
       }
     >
       <LoginContent />
