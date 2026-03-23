@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, Suspense, useCallback, useRef, useState } from "react";
+import { FormEvent, Suspense, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiRequest } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
@@ -17,31 +17,11 @@ function PinInput({
   onChange: (v: string) => void;
   disabled?: boolean;
 }) {
-  const refs = useRef<(HTMLInputElement | null)[]>([]);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const focusIndex = useCallback(
-    (i: number) => {
-      if (i >= 0 && i < length) refs.current[i]?.focus();
-    },
-    [length],
-  );
-
-  const handleChange = (i: number, char: string) => {
-    if (!/^\d?$/.test(char)) return;
-    const arr = value.split("");
-    arr[i] = char;
-    const next = arr.join("").slice(0, length);
-    onChange(next);
-    if (char && i < length - 1) focusIndex(i + 1);
-  };
-
-  const handleKeyDown = (
-    i: number,
-    e: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (e.key === "Backspace" && !value[i] && i > 0) {
-      focusIndex(i - 1);
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, "").slice(0, length);
+    onChange(raw);
   };
 
   const handlePaste = (e: React.ClipboardEvent) => {
@@ -50,31 +30,37 @@ function PinInput({
       .getData("text")
       .replace(/\D/g, "")
       .slice(0, length);
-    if (pasted) {
-      onChange(pasted);
-      focusIndex(Math.min(pasted.length, length - 1));
-    }
+    onChange(pasted);
   };
 
   return (
-    <div className="grid grid-cols-6 gap-2 w-full" onPaste={handlePaste}>
+    <div
+      className={`relative flex justify-center items-center gap-5 py-4 cursor-text${disabled ? " opacity-40" : ""}`}
+      onClick={() => inputRef.current?.focus()}
+    >
+      <input
+        ref={inputRef}
+        type="text"
+        inputMode="numeric"
+        autoComplete="one-time-code"
+        value={value}
+        onChange={handleChange}
+        onPaste={handlePaste}
+        disabled={disabled}
+        autoFocus
+        maxLength={length}
+        className="absolute inset-0 opacity-0 w-full h-full"
+        aria-label={`${length}-digit PIN`}
+      />
       {Array.from({ length }, (_, i) => (
-        <input
+        <div
           key={i}
-          ref={(el) => {
-            refs.current[i] = el;
-          }}
-          type="text"
-          inputMode="numeric"
-          maxLength={1}
-          value={value[i] ?? ""}
-          onChange={(e) => handleChange(i, e.target.value)}
-          onKeyDown={(e) => handleKeyDown(i, e)}
-          onFocus={(e) => e.target.select()}
-          disabled={disabled}
-          autoFocus={i === 0}
-          className="w-full h-14 text-center text-2xl font-mono rounded-glass bg-white/10 border border-white/20 text-primary focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-colors disabled:opacity-40"
-          aria-label={`PIN digit ${i + 1}`}
+          aria-hidden="true"
+          className={`w-4 h-4 rounded-full transition-all duration-200 ${
+            i < value.length
+              ? "bg-accent"
+              : "bg-white/10 border border-white/20"
+          }`}
         />
       ))}
     </div>
