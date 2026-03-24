@@ -1,0 +1,22 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: alec-hq-app
+    working_dir: /workspace
+    command: bash -lc "npm run dev -- --hostname 0.0.0.0"
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    environment:
+      HOSTNAME: 0.0.0.0
+      NODE_ENV: development
+    volumes:
+      - .:/workspace
+      - alec_hq_node_modules:/workspace/node_modules
+    restart: unless-stopped
+
+volumes:
+  alec_hq_node_modules:
