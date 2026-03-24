@@ -95,3 +95,15 @@ Preferred policy for new work:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SESSION_SECRET`
 - `SESSION_TTL_HOURS`
+
+### Multi-Agent Custom Automation Engine
+
+- `MULTI_AGENT_API_BASE_URL` — base URL of the deployed Multi-Agent Custom Automation Engine (output of `azd up`)
+- `AZURE_OPENAI_ENDPOINT` — Azure OpenAI resource endpoint
+- `AZURE_OPENAI_API_KEY` — Azure OpenAI API key (server-side only; never expose to client)
+- `AZURE_COSMOS_CONNECTION_STRING` — Cosmos DB connection string (server-side only; never expose to client)
+
+### Syncfusion Essential Studio® UI Edition
+
+- `NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY` — Syncfusion 5-member team license validation token (client-visible in Next.js bundle; keep out of source control via `.env.local`)
+- `SYNCFUSION_LICENSE_KEY` — .NET/Blazor variant; only relevant if a .NET frontend is added alongside the Next.js app (see `docs/integrations/multi-agent-essential-studio-setup.md`, Option B). Omit if using Next.js only.

@@ -37,7 +37,11 @@ async function loginWorkspace(
     })
     .click();
 
-  await page.getByRole("textbox", { name: /6-digit PIN/i }).fill(pin);
+  const keypad = page.getByRole("group", { name: /PIN keypad/i });
+
+  for (const digit of pin) {
+    await keypad.getByRole("button", { name: digit }).click();
+  }
 
   await page.getByRole("button", { name: /unlock/i }).click();
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();

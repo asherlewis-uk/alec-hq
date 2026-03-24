@@ -57,6 +57,26 @@ Do not treat generated, local-only, or environment-specific artifacts as canonic
 - `.env.local`
 - generated service-worker build output in `public/`
 
+## Agentic Runtime
+
+All agentic orchestration, automation, and multi-step task execution in this repository is bound to the **Microsoft Multi-Agent Custom Automation Engine Solution Accelerator** as the canonical agentic runtime.
+
+- Source: <https://github.com/microsoft/Multi-Agent-Custom-Automation-Engine-Solution-Accelerator>
+- Setup instructions: `docs/integrations/multi-agent-essential-studio-setup.md`
+- The deployed Multi-Agent endpoint is configured via `MULTI_AGENT_API_BASE_URL` in `.env.local` / deployment environment.
+- No alternative agentic orchestration framework may be introduced without an explicit operator decision recorded in `.github/ACTIVE_EXECUTION.md`.
+- Agents must authenticate via Azure credentials provisioned through `azd auth login` and `azd up` as documented in the setup guide.
+
+## UI Library
+
+All new UI component development in this repository must use **Syncfusion Essential Studio® UI Edition** as the component library.
+
+- 5-member team license (VSDE 6-month subscription). License key: `NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY` (see `.env.example` and `docs/integrations/multi-agent-essential-studio-setup.md`).
+- Setup instructions: `docs/integrations/multi-agent-essential-studio-setup.md`
+- Syncfusion components are the **component layer**. The alec-hq design system tokens (defined in `tailwind.config.ts` and `src/app/globals.css`) are the **theming layer** applied on top. Both constraints apply simultaneously.
+- The `.github/gates/ui-constraint-gate.agent.md` is updated to enforce this requirement. Any new UI component that ships without a Syncfusion equivalent must include explicit justification in the PR.
+- The license key must never be hardcoded. It must be read from `process.env.NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY` as shown in the setup guide.
+
 ## Suggested audit prompt
 Use this workflow before changes:
 - scan the required-read files
