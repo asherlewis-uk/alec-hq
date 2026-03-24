@@ -18,6 +18,8 @@ For any non-trivial task, the agent MUST load and comply with:
 * Private workspace data is mutually invisible across workspaces.
 * Architecture context lives in `.github/CONTEXT.md`.
 * Boundary enforcement is defined by `.github/gates/boundary-guard.agent.md`.
+* **Agentic runtime:** all agentic orchestration is bound to the [Microsoft Multi-Agent Custom Automation Engine Solution Accelerator](https://github.com/microsoft/Multi-Agent-Custom-Automation-Engine-Solution-Accelerator). Endpoint: `MULTI_AGENT_API_BASE_URL`.
+* **UI component library:** all new UI must use Syncfusion Essential Studio® UI Edition (EJ2 React). License key: `NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY`. See `docs/integrations/multi-agent-essential-studio-setup.md` and `.github/gates/ui-constraint-gate.agent.md`.
 
 ## Boundary Rules
 
