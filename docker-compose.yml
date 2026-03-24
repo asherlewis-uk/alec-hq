@@ -5,14 +5,14 @@ services:
       dockerfile: Dockerfile
     container_name: alec-hq-app
     working_dir: /workspace
-    command: bash -lc "if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then npm ci; fi && npm run dev -- --hostname 0.0.0.0"
+    command: bash -lc "if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then npm ci; fi && NODE_ENV=production npm run build && NODE_ENV=production npm run start -- --hostname 0.0.0.0"
     ports:
       - "3000:3000"
     env_file:
       - .env.local
     environment:
       HOSTNAME: 0.0.0.0
-      NODE_ENV: development
+      NODE_ENV: production
     volumes:
       - .:/workspace
       - alec_hq_node_modules:/workspace/node_modules

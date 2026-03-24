@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["bash", "-lc", "npm run dev -- --hostname 0.0.0.0"]
+CMD ["bash", "-lc", "NODE_ENV=production npm run build && NODE_ENV=production npm run start -- --hostname 0.0.0.0"]
