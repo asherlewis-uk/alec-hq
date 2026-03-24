@@ -131,3 +131,9 @@ npm run test:smoke
 1. Roll back to previous Vercel deployment.
 2. If needed, restore previous migration state via Supabase migration tooling.
 3. Re-run smoke validation against rolled-back deployment.
+
+## Integrations
+
+For wiring the **Multi-Agent Custom Automation Engine Solution Accelerator** and the **Syncfusion Essential Studio® UI Edition** (5-member team license), see:
+
+[`docs/integrations/multi-agent-essential-studio-setup.md`](docs/integrations/multi-agent-essential-studio-setup.md)
