@@ -1,68 +1,95 @@
 "use client";
 
-import { FormEvent, Suspense, useRef, useState } from "react";
+import { type FormEvent, Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiRequest } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
 import type { WorkspaceSummary } from "@/lib/types";
 
-function PinInput({
+function PinPad({
   length = 6,
   value,
-  onChange,
+  onDigitPress,
+  onBackspace,
   disabled,
 }: {
   length?: number;
   value: string;
-  onChange: (v: string) => void;
+  onDigitPress: (digit: string) => void;
+  onBackspace: () => void;
   disabled?: boolean;
 }) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/\D/g, "").slice(0, length);
-    onChange(raw);
-  };
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pasted = e.clipboardData
-      .getData("text")
-      .replace(/\D/g, "")
-      .slice(0, length);
-    onChange(pasted);
-  };
-
   return (
-    <div
-      className={`relative flex justify-center items-center gap-5 py-4 cursor-text${disabled ? " opacity-40" : ""}`}
-      onClick={() => inputRef.current?.focus()}
-    >
-      <input
-        ref={inputRef}
-        type="text"
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        value={value}
-        onChange={handleChange}
-        onPaste={handlePaste}
-        disabled={disabled}
-        autoFocus
-        maxLength={length}
-        className="absolute inset-0 opacity-0 w-full h-full"
+    <div className="space-y-6">
+      <div
+        role="group"
         aria-label={`${length}-digit PIN`}
-      />
-      {Array.from({ length }, (_, i) => (
-        <div
-          key={i}
-          aria-hidden="true"
-          className={`w-4 h-4 rounded-full transition-all duration-200 ${
-            i < value.length
-              ? "bg-accent"
-              : "bg-white/10 border border-white/20"
-          }`}
-        />
-      ))}
+        aria-describedby="pin-entry-status"
+        className={`flex justify-center gap-3${disabled ? " opacity-40" : ""}`}
+      >
+        {Array.from({ length }, (_, i) => {
+          const filled = i < value.length;
+
+          return (
+            <div
+              key={i}
+              aria-hidden="true"
+              className={`glass flex h-12 w-12 items-center justify-center rounded-full${filled ? " glass-accent" : ""}`}
+            >
+              <div
+                className={`h-3.5 w-3.5 rounded-full transition-all duration-200${filled ? " bg-accent" : ""}`}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      <p id="pin-entry-status" className="sr-only">
+        {value.length} of {length} digits entered.
+      </p>
+
+      <div
+        role="group"
+        aria-label="PIN keypad"
+        className="grid grid-cols-3 gap-3"
+      >
+        {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit) => (
+          <Button
+            key={digit}
+            type="button"
+            variant="outline"
+            disabled={disabled || value.length >= length}
+            onClick={() => onDigitPress(digit)}
+            className="h-14 text-xl"
+            aria-label={digit}
+          >
+            {digit}
+          </Button>
+        ))}
+
+        <div aria-hidden="true" />
+
+        <Button
+          type="button"
+          variant="outline"
+          disabled={disabled || value.length >= length}
+          onClick={() => onDigitPress("0")}
+          className="h-14 text-xl"
+          aria-label="0"
+        >
+          0
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          disabled={disabled || value.length === 0}
+          onClick={onBackspace}
+          className="h-14 text-sm"
+        >
+          Delete
+        </Button>
+      </div>
     </div>
   );
 }
@@ -83,6 +110,18 @@ function LoginContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const canSubmit = selectedSlug !== null && pin.length === 6;
+
+  const appendDigit = (digit: string) => {
+    setPin((current) =>
+      current.length >= 6 ? current : `${current}${digit.replace(/\D/g, "")}`,
+    );
+    setError(null);
+  };
+
+  const removeLastDigit = () => {
+    setPin((current) => current.slice(0, -1));
+    setError(null);
+  };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -109,6 +148,12 @@ function LoginContent() {
     }
   };
 
+  const handleWorkspaceSelect = (workspaceSlug: string) => {
+    setSelectedSlug(workspaceSlug);
+    setPin("");
+    setError(null);
+  };
+
   const handleBack = () => {
     setSelectedSlug(null);
     setPin("");
@@ -128,7 +173,7 @@ function LoginContent() {
                 <button
                   key={ws.slug}
                   type="button"
-                  onClick={() => setSelectedSlug(ws.slug)}
+                  onClick={() => handleWorkspaceSelect(ws.slug)}
                   className="w-full flex items-center gap-3 px-4 py-4 rounded-glass glass hover:glass-accent transition-all duration-200 text-left"
                 >
                   <span className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-bold text-lg">
@@ -149,9 +194,18 @@ function LoginContent() {
             </p>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-              <PinInput value={pin} onChange={setPin} disabled={isSubmitting} />
+              <PinPad
+                value={pin}
+                onDigitPress={appendDigit}
+                onBackspace={removeLastDigit}
+                disabled={isSubmitting}
+              />
 
-              {error && <p className="text-sm text-red-300">{error}</p>}
+              {error && (
+                <p className="glass glass-danger rounded-glass px-3 py-2 text-sm text-primary">
+                  {error}
+                </p>
+              )}
 
               <div className="flex gap-3">
                 <Button
