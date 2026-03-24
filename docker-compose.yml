@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: alec-hq-app
     working_dir: /workspace
-    command: bash -lc "npm run dev -- --hostname 0.0.0.0"
+    command: bash -lc "if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then npm ci; fi && npm run dev -- --hostname 0.0.0.0"
     ports:
       - "3000:3000"
     env_file:

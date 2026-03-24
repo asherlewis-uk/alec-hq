@@ -26,7 +26,7 @@ Expected outcome: the app container is built, the app container is running, and 
 ## Verification Contract
 Primary verification path: `bash scripts/verify-agentic.sh`
 Mandatory checks: `npm run lint`, `npm run typecheck`, `npm run build`.
-Optional check when the required E2E variables are exported in the current environment (for example, by exporting them from `.env.local` via `set -a; source .env.local; set +a`): `npm run test:smoke`.
+Optional check when the required E2E variables are populated in `.env.local`: `npm run test:smoke`.
 
 ## Current Bounded Queue
 ### Tranche A — Execution Scaffold
