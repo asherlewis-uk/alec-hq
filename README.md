@@ -32,18 +32,52 @@ Copy `.env.example` to `.env.local` and populate values.
 | ------------------------------- | ---------------------------- |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Optional compatibility value |
 
-## Optional Test Environment Variables
+## Optional Smoke Test Environment Variables
 
-| Variable                        | Purpose                                                                  |
-| ------------------------------- | ------------------------------------------------------------------------ |
-| `E2E_BASE_URL`                  | Base URL for Playwright smoke tests                                      |
-| `E2E_BYPASS_PWA_INSTALL_GATE`   | Set to `1` only for automation runs; the smoke suite sends the matching bypass header |
-| `E2E_WORKSPACE_A_SLUG`          | Workspace A slug for smoke tests                                         |
-| `E2E_WORKSPACE_A_PIN`           | Workspace A PIN for smoke tests                                          |
-| `E2E_WORKSPACE_B_SLUG`          | Workspace B slug for smoke tests                                         |
-| `E2E_WORKSPACE_B_PIN`           | Workspace B PIN for smoke tests                                          |
+| Variable                      | Purpose                                                                                  |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `E2E_BASE_URL`                | Base URL for Playwright smoke tests. Use `http://127.0.0.1:3000` for containerized local runs. |
+| `E2E_BYPASS_PWA_INSTALL_GATE` | Set to `1` only for automation runs. For the containerized path, this must exist in `.env.local` before bootstrap so the running app process sees it. |
+| `E2E_WORKSPACE_A_SLUG`        | Workspace A slug for smoke tests                                                         |
+| `E2E_WORKSPACE_A_PIN`         | Workspace A PIN for smoke tests                                                          |
+| `E2E_WORKSPACE_B_SLUG`        | Workspace B slug for smoke tests                                                         |
+| `E2E_WORKSPACE_B_PIN`         | Workspace B PIN for smoke tests                                                          |
 
-## Local Development
+## Containerized Local Development (Primary Path)
+
+Bootstrap the app in the expected agentic containerized environment:
+
+```bash
+bash scripts/bootstrap-agentic.sh
+```
+
+Expected outcome:
+
+- the `alec-hq-app` container is built
+- the app is running
+- the container health check passes
+- the local URL is `http://127.0.0.1:3000`
+
+Run repository verification with the same containerized path:
+
+```bash
+bash scripts/verify-agentic.sh
+```
+
+Mandatory checks run by the verify script:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm run build`
+
+Optional smoke execution:
+
+- smoke runs only when all required `E2E_*` variables are populated in `.env.local`
+- for containerized smoke runs, `E2E_BYPASS_PWA_INSTALL_GATE=1` must already be present in `.env.local` before running bootstrap or before restarting the app container
+
+## Manual Local Development (Optional)
+
+Use this only when you intentionally do not want the containerized path.
 
 ```bash
 npm install
@@ -72,15 +106,9 @@ npm run ci
 
 ## Smoke Tests (Playwright)
 
-Set env vars and run:
+Populate `.env.local` with the smoke variables, ensure the app process has been started or restarted with those values present, then run:
 
 ```bash
-set E2E_BASE_URL=http://127.0.0.1:3000
-set E2E_BYPASS_PWA_INSTALL_GATE=1
-set E2E_WORKSPACE_A_SLUG=asher
-set E2E_WORKSPACE_A_PIN=<workspace-a-pin>
-set E2E_WORKSPACE_B_SLUG=alec
-set E2E_WORKSPACE_B_PIN=<workspace-b-pin>
 npm run test:smoke
 ```
 

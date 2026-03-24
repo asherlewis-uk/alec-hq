@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
+APP_CONTAINER_NAME="alec-hq-app"
+
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
     echo "Required command missing: $1" >&2
@@ -15,7 +17,34 @@ read_env_value() {
   local key="$1"
   local line
   line=$(grep -E "^${key}=" .env.local | tail -n 1 || true)
-  echo "${line#*=}"
+  printf '%s' "${line#*=}" | tr -d '\r'
+}
+
+wait_for_app_readiness() {
+  local attempts=60
+  local state
+  local health
+
+  for ((i=1; i<=attempts; i++)); do
+    state="$(docker inspect -f '{{.State.Status}}' "$APP_CONTAINER_NAME" 2>/dev/null || true)"
+    health="$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$APP_CONTAINER_NAME" 2>/dev/null || true)"
+
+    if [[ "$state" == "running" && ( "$health" == "healthy" || "$health" == "none" ) ]]; then
+      return 0
+    fi
+
+    if [[ "$state" == "exited" || "$state" == "dead" ]]; then
+      echo "App container entered a failed state: $state" >&2
+      docker logs --tail 200 "$APP_CONTAINER_NAME" >&2 || true
+      exit 1
+    fi
+
+    sleep 2
+  done
+
+  echo "Timed out waiting for app readiness." >&2
+  docker logs --tail 200 "$APP_CONTAINER_NAME" >&2 || true
+  exit 1
 }
 
 require_command docker
@@ -57,6 +86,8 @@ fi
 
 "${COMPOSE_CMD[@]}" down --remove-orphans >/dev/null 2>&1 || true
 "${COMPOSE_CMD[@]}" up --build -d app
+
+wait_for_app_readiness
 
 cat <<'EOF'
 Bootstrap complete.

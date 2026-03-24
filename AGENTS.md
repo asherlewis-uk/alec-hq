@@ -4,14 +4,15 @@ Repository root is the active workspace.
 
 ## Required read order before making changes
 Read these files before planning or editing code:
-1. `.github/CONTEXT.md`
-2. `.github/execution-spec-full.md`
-3. `.github/build-history.md`
-4. `.github/copilot-instructions.md`
-5. `.github/gates/boundary-guard.agent.md`
-6. `.github/gates/ui-constraint-gate.agent.md`
-7. `.github/gates/hardening-gate.prompt.md`
-8. `.github/gates/verification-completion-gate.prompt.md`
+1. `.github/ACTIVE_EXECUTION.md`
+2. `.github/CONTEXT.md`
+3. `.github/execution-spec-full.md`
+4. `.github/build-history.md`
+5. `.github/copilot-instructions.md`
+6. `.github/gates/boundary-guard.agent.md`
+7. `.github/gates/ui-constraint-gate.agent.md`
+8. `.github/gates/hardening-gate.prompt.md`
+9. `.github/gates/verification-completion-gate.prompt.md`
 
 ## First task on implementation requests
 Before making any code changes:
@@ -31,12 +32,13 @@ For each conflict, include:
 ## Authority order
 When instructions conflict, prefer:
 1. this `AGENTS.md`
-2. `.github/gates/*.agent.md`
-3. `.github/gates/*.prompt.md`
-4. `.github/execution-spec-full.md`
-5. `.github/CONTEXT.md`
-6. `.github/build-history.md`
-7. `.github/copilot-instructions.md`
+2. `.github/ACTIVE_EXECUTION.md`
+3. `.github/gates/*.agent.md`
+4. `.github/gates/*.prompt.md`
+5. `.github/execution-spec-full.md`
+6. `.github/CONTEXT.md`
+7. `.github/build-history.md`
+8. `.github/copilot-instructions.md`
 
 ## Editing rules
 - Keep changes minimal and local to the requested scope.

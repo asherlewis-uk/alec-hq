@@ -16,6 +16,16 @@ services:
     volumes:
       - .:/workspace
       - alec_hq_node_modules:/workspace/node_modules
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:3000/login',{redirect:'manual'}).then((r)=>process.exit(r.status < 500 ? 0 : 1)).catch(()=>process.exit(1))\"",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
     restart: unless-stopped
 
 volumes:
