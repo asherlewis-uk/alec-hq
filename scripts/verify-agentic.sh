@@ -94,7 +94,7 @@ if [[ -n "$E2E_WORKSPACE_A_SLUG_VALUE" && -n "$E2E_WORKSPACE_A_PIN_VALUE" && -n 
   has_full_smoke_config=1
 fi
 
-"${COMPOSE_CMD[@]}" exec -T app bash -lc "if [ ! -d node_modules ] || [ -z \"\$(ls -A node_modules 2>/dev/null)\" ]; then npm ci; fi && npm run lint && npm run typecheck && npm run build"
+"${COMPOSE_CMD[@]}" exec -T app bash -lc "if [ ! -d node_modules ] || [ -z \"\$(ls -A node_modules 2>/dev/null)\" ]; then npm ci; fi && npm run lint && npm run typecheck && NODE_ENV=production npm run build"
 
 if (( has_full_smoke_config )); then
   if [[ "$E2E_BYPASS_VALUE" != "1" ]]; then
